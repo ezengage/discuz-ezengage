@@ -2,12 +2,20 @@
 if(!defined('IN_DISCUZ')) {
 	exit('Access Denied');
 }
+
 @include_once DISCUZ_ROOT.'./plugins/ezengage/common.inc.php';
+@include_once DISCUZ_ROOT.'./plugins/ezengage/apiclient.php';
 
 $ezeApiClient = new EzEngageApiClient($G_EZE_OPTIONS['eze_app_key']);
+if(empty($G_EZE_OPTIONS['eze_app_key'])){
+    exit('Bad Configuration');
+}
+if(empty($_POST['token'])){
+    exit('Bad Request, missing token.');
+}
 $profile = $ezeApiClient->getProfile($_POST['token']);
 if(!$profile){
-    exit('bad request');
+    exit('remote server error');
 }
 
 $identity = mysql_real_escape_string($profile['identity']);

@@ -1,0 +1,118 @@
+{template header}
+
+<!--{if !empty($message)}-->
+$ucsynlogin
+<script type="text/javascript" reload="1">
+{if $message == 2}
+	hideWindow('login');
+	showWindow('register', '$location');
+{elseif $message == 1}
+	display('main_messaqge');
+	display('layer_login');
+	display('layer_message');
+	{if $groupid == 8}
+		$('messageleft').innerHTML = '<p>{lang login_succeed} $usergroups $discuz_user</p><p>{lang login_succeed_inactive_member}</p>';
+		$('messageright').innerHTML = '<a href="memcp.php">{lang user_center}</a>';
+		setTimeout("window.location.href='memcp.php'", $mrefreshtime);
+	{else}
+		$('messageleft').innerHTML = '<p>{lang login_succeed} $usergroups $discuz_user</p>';
+		{if !empty($floatlogin)}
+			$('messageright').innerHTML = '<a href="javascript:;" onclick="location.reload()">{lang login_refresh}</a>';
+			setTimeout('location.reload()', $mrefreshtime);
+		{else}
+			{eval $dreferer = str_replace('&amp;', '&', dreferer());}
+			$('messageright').innerHTML = '<a href="$dreferer">{lang login_location}</a>';
+			setTimeout("window.location.href='$dreferer'", $mrefreshtime);
+		{/if}
+	{/if}
+	{if $_DCACHE['settings']['frameon'] && $_DCOOKIE['frameon'] == 'yes'}
+		if(top != self) {
+			parent.leftmenu.location.reload();
+		}
+	{/if}
+{/if}
+</script>
+<!--{else}-->
+<!--{if empty($infloat)}-->
+<div id="nav"><a href="$indexname">$bbname</a> $navigation</div>
+<div id="wrap" class="wrap s_clear">
+	<div class="main"><div class="content nofloat">
+<!--{/if}-->
+<div class="fcontent" id="main_messaqge">
+  <div id="layer_ezenage_login">
+		<h3 class="float_ctrl">
+			<em id="returnmessage3">{lang ezengage:login_with_ezengage}</em>
+			<span><!--{if !empty($infloat)}--><a href="javascript:;" class="float_close" onclick="hideWindow('login')" title="{lang close}">{lang close}</a><!--{/if}--></span>
+		</h3>
+		<div class="postbox">
+      <div class="logininfo multinfo">
+      {eval eze_login_widget('normal');}
+      </div>
+		</div>
+  </div>
+</div>
+<div id="layer_message" class="fcontent alert_win" style="display: none;">
+	<h3 class="float_ctrl">
+		<em>{lang login_member}</em>
+		<span><!--{if !empty($infloat)}--><a href="javascript:;" class="float_close" onclick="hideWindow('login')" title="{lang close}">{lang close}</a><!--{/if}--></span>
+	</h3>
+	<hr class="shadowline" />
+	<div class="postbox"><div class="alert_right">
+		<div id="messageleft"></div>
+		<p class="alert_btnleft" id="messageright"></p>
+	</div>
+</div>
+
+<script type="text/javascript" src="{$jspath}md5.js?{VERHASH}" reload="1"></script>
+<script type="text/javascript" reload="1">
+var pwdclear = 0;
+function initinput_login() {
+	document.body.focus();
+	$('loginform').username.focus();
+	simulateSelect('loginfield');
+	simulateSelect('questionid');
+}
+if(BROWSER.ie && BROWSER.ie < 7) {
+	setTimeout('initinput_login()', 500);
+} else {
+	initinput_login();
+}
+{if $sitemessage[login]}
+showPrompt('custominfo_login', 'click', '{echo trim($sitemessage[login][array_rand($sitemessage[login])])}', $sitemessage[time]);
+{/if}
+
+{if $pwdsafety}
+var pwmd5log = new Array();
+function pwmd5() {
+	numargs = pwmd5.arguments.length;
+	for(var i = 0; i < numargs; i++) {
+		if(!pwmd5log[pwmd5.arguments[i]] || $(pwmd5.arguments[i]).value.length != 32) {
+			pwmd5log[pwmd5.arguments[i]] = $(pwmd5.arguments[i]).value = hex_md5($(pwmd5.arguments[i]).value);
+		}
+	}
+}
+{/if}
+
+function clearpwd() {
+	if(pwdclear) {
+		$('password3').value = '';
+	}
+	pwdclear = 0;
+}
+
+function messagehandle_lostpwform(key) {
+	if(key == 141) {
+		$('messageleft').innerHTML = '<p>{lang getpassword_msg}</p>';
+		$('messageright').innerHTML = '<a href="javascript:;" onclick="hideMenu(\'fwin_login\', \'win\')">{lang close}</a>';
+	}
+}
+
+</script>
+<!--{/if}-->
+
+{eval updatesession();}
+<!--{if empty($infloat)}-->
+	</div></div>
+</div>
+<!--{/if}-->
+{template footer}
