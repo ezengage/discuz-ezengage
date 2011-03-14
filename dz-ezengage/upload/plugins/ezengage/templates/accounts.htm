@@ -1,0 +1,57 @@
+{template header}
+
+<div id="nav">
+	<a href="$indexname">$bbname</a> &raquo; {lang ezengage:myaccounts}
+</div>
+<div id="wrap" class="wrap with_side s_clear">
+	<div class="main">
+		<div class="content">
+
+		<h1>{lang ezengage:myaccounts}</h1>
+
+		<div class="datalist">
+		<form method="post" action="plugin.php?id=ezengage:accounts&op=update">
+		<input type="hidden" name="formhash" value="{FORMHASH}" />
+		<table cellspacing="0" cellpadding="0" class="datatable" style="table-layout:fixed;margin-top:10px;">
+		<thead class="colplural">
+			<tr><td width="40"></td><td>{lang ezengage:provider}</td><td width="300">{lang ezengage:provider_username}</td><td>{lang ezengage:should_sync}</td></tr>
+		</thead>
+		<!--{if $eze_profiles}-->
+			<!--{loop $eze_profiles $profile}-->
+			<tr>
+				<td><input name="delete[]" type="checkbox" class="checkbox" value="$profile[pid]" /></td>
+				<td>$profile[provider_code]</td>
+				<td>$profile[display_name]</td>
+        <td>
+            <!-- {if $profile[should_sync]} -->
+              <input name="should_sync[]" type="checkbox" class="checkbox" checked="checked" value="$profile[pid]" />
+            <!-- {else} -->
+              <input name="should_sync[]" type="checkbox" class="checkbox" value="$profile[pid]" />
+            <!-- {/if} -->
+        </td>
+			</tr>
+			<!--{/loop}-->
+			<tr><td><input class="checkbox" type="checkbox" id="chkall" name="chkall" onclick="checkall(this.form);" /> <label for="chkall">{lang delete_check}</label></td>
+			<td><button type="submit" class="submit" name="updateuser" value="yes" >{lang submit}</button></td></tr>
+		<!--{else}-->
+			<tr><td colspan="4"><p class="nodata">{lang data_nonexistence}</p></td></tr>
+		<!--{/if}-->
+		</table>
+		</form>
+		</div>
+    <h2>{lang ezengage:connect_more_account}</h2>
+    <iframe boder="0" src="http://ezengage.ezengage.net/login/ezengage/widget?token_cb=http%3A//dev_debian/bbs/upload/plugin.php%3Fid%3Dezengage%3Atoken&force_login=1" scrolling="no" frameBorder="no" style="width:350px;height:200px;margin-bottom:10px;"></iframe> 
+		</div>
+	</div>
+	<div class="side">
+		{subtemplate personal_navbar}
+	</div>
+</div>
+
+<script>
+function deletemruser(href) {
+	showDialog('{lang ezengage:deleteconfirm}', 'confirm', '', function () { location.href=href });
+}
+</script>
+
+{template footer}

@@ -1,0 +1,14 @@
+		<!--{if $eze_profiles}-->
+      <div style="margin-bottom:5px;">
+			<!--{loop $eze_profiles $profile}-->
+            <!-- {if $profile[should_sync]} -->
+              <input name="eze_should_sync[]" type="checkbox" class="checkbox" checked="checked" value="$profile[pid]" />
+            <!-- {else} -->
+              <input name="eze_should_sync[]" type="checkbox" class="checkbox" value="$profile[pid]" />
+            <!-- {/if} -->
+        同步到
+				$profile[provider_code]
+				的$profile[display_name]
+			<!--{/loop}-->
+      </div>
+		<!--{/if}-->

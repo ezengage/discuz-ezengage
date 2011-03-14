@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<root>
+    <item id="Title"><![CDATA[Discuz! Plugin]]></item>
+    <item id="Version"><![CDATA[7.2]]></item>
+    <item id="Time"><![CDATA[2011-03-14 16:52]]></item>
+    <item id="From"><![CDATA[ezEngage Demo Discuz Site (http://dev_debian/bbs/upload/)]]></item>
+    <item id="Data">
+        <item id="plugin">
+            <item id="available"><![CDATA[1]]></item>
+            <item id="adminid"><![CDATA[1]]></item>
+            <item id="name"><![CDATA[ezEngage - 将你的站点连接到社交网络]]></item>
+            <item id="identifier"><![CDATA[ezengage]]></item>
+            <item id="description"><![CDATA[让你的站点支持使用新浪微博,腾讯微博等帐号登录]]></item>
+            <item id="datatables"><![CDATA[eze_profile]]></item>
+            <item id="directory"><![CDATA[ezengage/]]></item>
+            <item id="copyright"><![CDATA[ezEngage Team]]></item>
+            <item id="version"><![CDATA[]]></item>
+            <item id="__modules">
+                <item id="0">
+                    <item id="name"><![CDATA[accounts]]></item>
+                    <item id="menu"><![CDATA[第三方帐号]]></item>
+                    <item id="url"><![CDATA[plugin.php?id=ezengage:accounts]]></item>
+                    <item id="type"><![CDATA[7]]></item>
+                    <item id="adminid"><![CDATA[0]]></item>
+                    <item id="displayorder"><![CDATA[0]]></item>
+                </item>
+                <item id="1">
+                    <item id="name"><![CDATA[sync]]></item>
+                    <item id="type"><![CDATA[13]]></item>
+                    <item id="adminid"><![CDATA[1]]></item>
+                    <item id="displayorder"><![CDATA[0]]></item>
+                </item>
+                <item id="2">
+                    <item id="name"><![CDATA[bind]]></item>
+                    <item id="type"><![CDATA[13]]></item>
+                    <item id="adminid"><![CDATA[1]]></item>
+                    <item id="displayorder"><![CDATA[0]]></item>
+                </item>
+                <item id="3">
+                    <item id="name"><![CDATA[token]]></item>
+                    <item id="type"><![CDATA[13]]></item>
+                    <item id="adminid"><![CDATA[1]]></item>
+                    <item id="displayorder"><![CDATA[0]]></item>
+                </item>
+            </item>
+        </item>
+        <item id="version"><![CDATA[7.2]]></item>
+        <item id="hooks">
+            <item id="0">
+                <item id="available"><![CDATA[1]]></item>
+                <item id="title"><![CDATA[login_widget]]></item>
+                <item id="description"><![CDATA[显示一个ezEngage的LoginWidget]]></item>
+                <item id="code"><![CDATA[echo '<iframe boder="0" src="http://ezengage.ezengage.net/login/ezengage/widget/small?token_cb=http%3A//dev_debian/bbs/upload/plugin.php%3Fid%3Dezengage%3Atoken"  scrolling="no" frameBorder="no" style="width:auto;height:130px;margin-bottom:10px;"></iframe>';]]></item>
+            </item>
+        </item>
+        <item id="vars">
+            <item id="0">
+                <item id="displayorder"><![CDATA[2]]></item>
+                <item id="title"><![CDATA[ezEngage App Key]]></item>
+                <item id="description"><![CDATA[]]></item>
+                <item id="variable"><![CDATA[eze_app_key]]></item>
+                <item id="type"><![CDATA[text]]></item>
+                <item id="value"><![CDATA[]]></item>
+                <item id="extra"><![CDATA[]]></item>
+            </item>
+            <item id="1">
+                <item id="displayorder"><![CDATA[1]]></item>
+                <item id="title"><![CDATA[ezEngage App ID]]></item>
+                <item id="description"><![CDATA[]]></item>
+                <item id="variable"><![CDATA[eze_app_id]]></item>
+                <item id="type"><![CDATA[text]]></item>
+                <item id="value"><![CDATA[]]></item>
+                <item id="extra"><![CDATA[]]></item>
+            </item>
+            <item id="2">
+                <item id="displayorder"><![CDATA[0]]></item>
+                <item id="title"><![CDATA[ezEngage App Domain]]></item>
+                <item id="description"><![CDATA[]]></item>
+                <item id="variable"><![CDATA[eze_app_domain]]></item>
+                <item id="type"><![CDATA[text]]></item>
+                <item id="value"><![CDATA[]]></item>
+                <item id="extra"><![CDATA[]]></item>
+            </item>
+        </item>
+    </item>
+</root>
