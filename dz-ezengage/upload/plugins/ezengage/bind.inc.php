@@ -6,7 +6,6 @@ if(!defined('IN_DISCUZ')) {
 @include_once DISCUZ_ROOT.'./plugins/ezengage/common.inc.php';
 @include_once DISCUZ_ROOT.'./plugins/ezengage/ezengage.lang.php';
 
-
 unset($name, $directory, $vars);
 
 extract($_DPLUGIN[$identifier], EXTR_SKIP);
@@ -18,10 +17,19 @@ $escaped_token = mysql_real_escape_string($token);
 $profile = $db->fetch_first("SELECT * FROM {$tablepre}eze_profile WHERE token='{$escaped_token}'");
 
 if(!$profile){
-    die('Bad Request');
+    exit('Bad Request');
 }
-if($profile['uid'] > 0 && eze_login_user($profile['uid'])){
-    showmessage('login_succeed', $indexname);
+$profile['provider_name'] = $scriptlang['ezengage']['provider_name_' . $profile['provider_code']];
+
+if($profile['uid'] > 0){
+    if($discuz_uid && $profile['uid'] != $discuz_uid){
+        showmessage('ezengage:already_bind_to_other_uer');
+        //dheader("Location: plugin.php?id=ezengage:login");
+        //die('bad request');
+    }
+    else if(eze_login_user($profile['uid'])){
+        showmessage('login_succeed', $indexname);
+    } 
 }
 else{
     //如果当前已经有discuz 用户登录了,将eze 用户绑定到该用户

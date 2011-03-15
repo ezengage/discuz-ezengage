@@ -96,3 +96,27 @@ function eze_login_widget($style = 'normal'){
     }
     //TODO add more style
 }
+
+function eze_get_profiles($uid){
+    global $db;
+    global $scriptlang;
+    global $tablepre;
+    $eze_profiles = array();
+    $query = $db->query("SELECT * FROM {$tablepre}eze_profile WHERE uid='$uid'");
+    while($profile = $db->fetch_array($query)) {
+        $profile['provider_name'] = $scriptlang['ezengage']['provider_name_' . $profile['provider_code']];
+        $eze_profiles[] = $profile;
+    }
+    return $eze_profiles;
+}
+
+function eze_trigger($event){
+    if($event == 'newthread' || $event == 'newreply'){
+        global $db,$discuz_uid,$tablepre;
+        global $pid,$action;
+        global $eze_should_sync;
+        if($pid && $eze_should_sync){
+            eze_sync_post(intval($pid), $eze_should_sync);
+        }
+    }
+}

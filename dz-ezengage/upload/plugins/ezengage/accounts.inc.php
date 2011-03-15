@@ -29,12 +29,7 @@ if($op == 'update' && submitcheck('updateuser')) {
 	showmessage('ezengage:updateuser_succeed', 'plugin.php?id=ezengage:accounts');
 }
 	
-$eze_profiles = array();
-$query = $db->query("SELECT * FROM {$tablepre}eze_profile WHERE uid='$discuz_uid'");
-while($profile = $db->fetch_array($query)) {
-	$eze_profiles[] = $profile;
-}
-
+$eze_profiles = eze_get_profiles($discuz_uid);
 include template('ezengage:accounts');
 
 ?>

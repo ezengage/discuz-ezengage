@@ -1,9 +1,16 @@
 <?php
 $scriptlang['ezengage'] = array (
-    'provider_tencentweibo' => '腾讯微博',
+    'provider_name_sinaweibo' => '新浪微博',
+    'provider_name_tencentweibo' => '腾讯微博',
+    'provider_name_sohuweibo' => '搜狐微博',
+    'provider_name_neteaseweibo' => '网易微博',
+    'provider_name_renren' => '人人网',
     'bind_success' => '帐号连接成功',
     'login_link_label' => '通过第三方帐号登录',
+    'login_link_label_long' => '你也可以使用新浪微博，腾讯微博等帐号登录',
+    'updateuser_succeed' => '修改成功',
 );
+
 $templatelang['ezengage'] = array (
     'provider_tencentweibo' => '腾讯微博',
     'myaccounts' => '我绑定的帐号',
