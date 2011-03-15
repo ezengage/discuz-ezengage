@@ -18,6 +18,13 @@ if(!$profile){
     exit('remote server error');
 }
 
+//convert charset 
+foreach($profile as $key => $val){
+    if(is_string($val)){
+        $profile[$key] = eze_convert($val, 'UTF-8', $charset);
+    }
+}
+
 $identity = mysql_real_escape_string($profile['identity']);
 $row = $db->fetch_first("SELECT token,uid,identity FROM {$tablepre}eze_profile WHERE identity='{$identity}'");
 //new user

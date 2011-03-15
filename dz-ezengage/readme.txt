@@ -12,9 +12,7 @@ showmessage('post_newthread_succeed', "viewthread.php?tid=$tid&extra=$extra");
 在这一行之前加入下面的代码
 <pre>
 //start ezengage hack
-if(function_exists('eze_trigger')){
-    eze_trigger('newthread');
-}   
+if(function_exists('eze_trigger')){eze_trigger('newthread');}   
 //end ezengage hack
 </pre>
 

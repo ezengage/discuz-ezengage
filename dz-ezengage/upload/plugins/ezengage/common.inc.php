@@ -7,6 +7,11 @@ if(!defined('IN_DISCUZ')) {
 $G_EZE_OPTIONS = $_DPLUGIN['ezengage']['vars'];
 @require_once DISCUZ_ROOT.'./forumdata/plugins/ezengage.lang.php';
 
+/**
+ * 同步帖子
+ * @pid post pid
+ * @should_sync profile pid array
+ */
 function eze_sync_post($pid, $should_sync){
     global $G_EZE_OPTIONS;
     global $tablepre;
@@ -14,35 +19,88 @@ function eze_sync_post($pid, $should_sync){
     if(count($should_sync) <= 0){
         return;
     }
-    #TODO CHECK eze_app_key
+    //TODO raise error  
+    if(empty($G_EZE_OPTIONS['eze_app_key'])){
+        return ;
+    }
     $ezeApiClient = new EzEngageApiClient($G_EZE_OPTIONS['eze_app_key']);
     $post = $db->fetch_first("SELECT tid,pid,authorid,subject,message FROM {$tablepre}posts WHERE pid={$pid};");
     if(!$post){
         return;
     }
     $uid = $post['authorid'];
+    //这里可能可以优化
+    $status = eze_format_status($post);
     foreach($should_sync as $profile_id){
         $row = $db->fetch_first("SELECT identity FROM {$tablepre}eze_profile WHERE uid={$uid} AND pid={$profile_id}");
         if($row){
-            $status = eze_format_status($post);
             $ret = $ezeApiClient->updateStatus($row['identity'], $status);
         }
     }
 }
 
+function eze_convert($source, $in, $out){
+    $in = strtoupper($in);
+    if ($in == "UTF8"){
+        $in = "UTF-8";
+    }   
+    if ($out == "UTF8"){
+        $out = "UTF-8";
+    }       
+    if( $in==$out ){
+        return $source;
+    }   
+    if(function_exists('mb_convert_encoding')) {
+        return mb_convert_encoding($source, $out, $in );
+    }elseif (function_exists('iconv'))  {
+        return iconv($in,$out."//IGNORE", $source);
+    }   
+    return $source;
+}   
+
+function eze_filter($content) {
+    global $_DCACHE;
+    //attach 
+    $content = preg_replace('!\[(attachimg|attach)\]([^\[]+)\[/(attachimg|attach)\]!', '', $content);
+    //image
+    $content = preg_replace('|\[img(?:=[^\]]*)?](.*?)\[/img\]|', '\\1 ', $content);
+    //UBB
+    $re ="#\[([a-z]+)(?:=[^\]]*)?\](.*?)\[/\\1\]#sim";
+    while(preg_match($re, $content)) {
+        $content = preg_replace($re, '\2', $content);
+    }
+    //smiles
+    $re = $_DCACHE['smileycodes'];
+    $_DCACHE['smilies']['searcharray'] = isset($_DCACHE['smilies']['searcharray']) ? $_DCACHE['smilies']['searcharray'] : array();
+    $content = str_replace($re, '', $content);
+    $content = preg_replace($_DCACHE['smilies']['searcharray'], '', $content);
+    return $content;
+}
+
 function eze_format_status($post){
     global $siteurl; 
-    $url = $siteurl . "viewthread.php?tid=$post[tid]";
-    #make sure truncate it in server side
-    $status = $post['subject'] . ' ' . $post['message'] . ' ' . $url;
+    global $charset;
+    if($post['first']){
+        $url = $siteurl . "viewthread.php?tid=$post[tid]";
+    }
+    else{
+        $url = $siteurl . "redirect.php?goto=findpost&pid=$post[pid]&ptid=$post[tid]";
+    }
+    $status = $post['subject'] . ' ' . $post['message'];
+    $status = eze_convert($status, $charset, 'UTF-8');
+    $status = eze_filter($status);
+    $status = $url . ' ' . $status;
+    #这里的截断只是为了防止大文章时发送过大的数据。
+    $status = substr($status, 0, 1000);
     return $status;
 }
 
 function eze_sync_checkbox_wrapper($uid, $show = true){
-    global $db,$tablepre;
+    global $db,$tablepre,$scriptlang;
     $eze_profiles = array();
-    $query = $db->query("SELECT * FROM {$tablepre}eze_profile WHERE uid=$uid");
+    $query = $db->query("SELECT * FROM {$tablepre}eze_profile WHERE uid=$uid;");
     while($profile = $db->fetch_array($query)) {
+        $profile['provider_name'] = $scriptlang['ezengage']['provider_name_' . $profile['provider_code']];
         $eze_profiles[] = $profile;
     }
     $html = array(
@@ -55,7 +113,7 @@ function eze_sync_checkbox_wrapper($uid, $show = true){
         else{
             $html[] = "<input name='eze_should_sync[]' type='checkbox' class='checkbox' value='$profile[pid]' />";
         }
-        $html[] =  "同步到$profile[provider_code] 的$profile[display_name]";
+        $html[] =  sprintf($scriptlang['ezengage']['sync_checkbox_label'], $profile['provider_name'], $profile['display_name']);
     }
     $html[] = '</div>';
     $html = implode('', $html);

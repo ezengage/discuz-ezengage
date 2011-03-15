@@ -9,6 +9,7 @@ $scriptlang['ezengage'] = array (
     'login_link_label' => '通过第三方帐号登录',
     'login_link_label_long' => '你也可以使用新浪微博，腾讯微博等帐号登录',
     'updateuser_succeed' => '修改成功',
+    'sync_checkbox_label' => '同步到%s的%s',
 );
 
 $templatelang['ezengage'] = array (
