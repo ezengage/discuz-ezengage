@@ -5,9 +5,15 @@ if(!defined('IN_DISCUZ')) {
     exit('Access Denied');
 }
 
+@include_once DISCUZ_ROOT.'./forumdata/cache/plugin_ezengage.php';
+
 class plugin_ezengage {
 
     function global_header(){  
+        global $G_EZE_OPTIONS;
+        if($G_EZE_OPTIONS['eze_disable_auto_modify_template']){
+            return '';
+        }
         global $discuz_uid;
         global $scriptlang;
         if($discuz_uid > 0){
@@ -29,6 +35,10 @@ class plugin_ezengage {
     }
 
     function global_footer(){
+        global $G_EZE_OPTIONS;
+        if($G_EZE_OPTIONS['eze_disable_auto_modify_template']){
+            return '';
+        }
         if(CURSCRIPT == 'logging'){
             global $scriptlang;
             $login_link_label = $scriptlang['ezengage']['login_link_label_long'];
@@ -50,42 +60,18 @@ class plugin_ezengage {
         }
     }
 
-    function loggin_add_ezengage_login_link_output(){
-        return '<h1>TEST XXXXXXXX</h1>'; 
-    }
-
-    function _eze_sync_checkbox_wrapper_html($uid){
-        global $db,$tablepre;
-        $eze_profiles = array();
-        $query = $db->query("SELECT * FROM {$tablepre}eze_profile WHERE uid=$uid");
-        while($profile = $db->fetch_array($query)) {
-            $eze_profiles[] = $profile;
-        }
-        $html = array(
-            '<div id="eze_sync_checkbox_wrapper" style="margin-bottom:5px;display:none;">',
-        );
-        foreach($eze_profiles as $profile){
-            if($profile['should_sync']){
-                $html[] = "<input name='eze_should_sync[]' type='checkbox' class='checkbox' checked='checked' value='$profile[pid]' />";
-            }
-            else{
-                $html[] = "<input name='eze_should_sync[]' type='checkbox' class='checkbox' value='$profile[pid]' />";
-            }
-            $html[] =  "同步到$profile[provider_code] 的$profile[display_name]";
-        }
-        $html[] = '</div>';
-        $html = implode('', $html);
-        return $html;
-    }
-
     //在快速回复的地方加入同步的选择框
     function viewthread_bottom_output(){
+        global $G_EZE_OPTIONS;
+        if($G_EZE_OPTIONS['eze_disable_auto_modify_template']){
+            return '';
+        }
         global $db,$discuz_uid,$tablepre;
         global $action;
         if($discuz_uid <= 0 ){
             return '';
         }
-        $html = $this->_eze_sync_checkbox_wrapper_html($discuz_uid);
+        $html = eze_sync_checkbox_wrapper($discuz_uid, false);
         $script = <<<EOT
             <script type='text/javascript'>
             try{
@@ -103,6 +89,11 @@ EOT;
     }
 
  	function post_bottom_output() {
+        global $G_EZE_OPTIONS;
+        if($G_EZE_OPTIONS['eze_disable_auto_modify_template']){
+            return '';
+        }
+ 
         global $db,$discuz_uid,$tablepre;
         global $action;
         if($discuz_uid <= 0 ){
@@ -113,7 +104,7 @@ EOT;
             return '';
         }
 
-        $html = $this->_eze_sync_checkbox_wrapper_html($discuz_uid);
+        $html = eze_sync_checkbox_wrapper($discuz_uid, false);
 
         $script = <<<EOT
             <script type='text/javascript'>
@@ -136,6 +127,10 @@ EOT;
     }
 
  	function global_footerlink() {
+        global $G_EZE_OPTIONS;
+        if($G_EZE_OPTIONS['eze_disable_auto_modify_template']){
+            return '';
+        }
 		global $db, $tablepre, $discuz_uid, $discuz_user, $scriptlang;
         return '<span class="pipe">|</span><a href="http://ezengage.com/?utm_source=party&utm_medium-friendlnk&utm_term=">ezEngage</a>';
     }

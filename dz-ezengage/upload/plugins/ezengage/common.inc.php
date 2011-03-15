@@ -3,7 +3,6 @@ if(!defined('IN_DISCUZ')) {
 	exit('Access Denied');
 }
 
-//@include_once DISCUZ_ROOT.'./forumdata/cache/plugin_'.$identifier.'.php';
 @include_once DISCUZ_ROOT.'./forumdata/cache/plugin_ezengage.php';
 $G_EZE_OPTIONS = $_DPLUGIN['ezengage']['vars'];
 @require_once DISCUZ_ROOT.'./forumdata/plugins/ezengage.lang.php';
@@ -39,15 +38,32 @@ function eze_format_status($post){
     return $status;
 }
 
-function eze_sync_checkbox($uid){
-    global $db;
-    global $tablepre;
+function eze_sync_checkbox_wrapper($uid, $show = true){
+    global $db,$tablepre;
     $eze_profiles = array();
-    $query = $db->query("SELECT * FROM {$tablepre}eze_profile WHERE uid='$uid'");
+    $query = $db->query("SELECT * FROM {$tablepre}eze_profile WHERE uid=$uid");
     while($profile = $db->fetch_array($query)) {
         $eze_profiles[] = $profile;
     }
-    include template('ezengage:sync_checkbox');
+    $html = array(
+        '<div id="eze_sync_checkbox_wrapper" style="margin-bottom:5px;' . ($show ? '':'display:none') . '">',
+    );
+    foreach($eze_profiles as $profile){
+        if($profile['should_sync']){
+            $html[] = "<input name='eze_should_sync[]' type='checkbox' class='checkbox' checked='checked' value='$profile[pid]' />";
+        }
+        else{
+            $html[] = "<input name='eze_should_sync[]' type='checkbox' class='checkbox' value='$profile[pid]' />";
+        }
+        $html[] =  "同步到$profile[provider_code] 的$profile[display_name]";
+    }
+    $html[] = '</div>';
+    $html = implode('', $html);
+    return $html;
+}
+
+function eze_sync_checkbox_output($uid){
+    echo eze_sync_checkbox_wrapper($uid, true);
 }
 
 function eze_login_user($uid){
