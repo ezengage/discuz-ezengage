@@ -8,7 +8,6 @@ if(!defined('IN_DISCUZ')) {
 }
 
 @include_once DISCUZ_ROOT.'./plugins/ezengage/common.inc.php';
-@include_once DISCUZ_ROOT.'./plugins/ezengage/ezengage.lang.php';
 
 $token = authcode($_DCOOKIE['eze_token'], 'DECODE');
 

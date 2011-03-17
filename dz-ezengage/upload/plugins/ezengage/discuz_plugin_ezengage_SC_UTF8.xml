@@ -116,6 +116,10 @@
                 <item id="deleteconfirm"><![CDATA[确认要解除连接?]]></item>
                 <item id="connect_more_account"><![CDATA[绑定更多帐号]]></item>
                 <item id="login_with_ezengage"><![CDATA[你可以使用下面这些网站的帐号登录]]></item>
+                <item id="you_are_using"><![CDATA[您现在正在用]]></item>
+                <item id="account"><![CDATA[帐号]]></item>
+                <item id="for_better_service"><![CDATA[为了让您更好地使用我们提供的服务]]></item>
+                <item id="auto_bind_after_login"><![CDATA[登录完成后将自动绑定]]></item>
             </item>
             <item id="installlang">
                 <item id="ask"><![CDATA[系统检测到您以前安装过本插件，请选择安装方式]]></item>

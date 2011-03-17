@@ -38,8 +38,10 @@ display('layer_message');
 <div id="wrap" class="wrap s_clear">
 	<div class="main"><div class="content nofloat">
 <!--{/if}-->
-<h2>您现在正在用$profile[provider_name]
-帐号 <i>$profile[preferred_username]</i>登录，为了让您更好地使用我们提供的服务，请设置以下信息：</h2>
+<h2>{lang ezengage:you_are_using}$profile[provider_name]
+{lang ezengage:account}<i>$profile[preferred_username]</i>.  
+{lang ezengage:for_better_service}
+</h2>
 <div class="fcontent" id="main_messaqge">
 	<div id="layer_bbrule" class="postbox" style="display: none;">
 		<div>
@@ -109,8 +111,8 @@ display('layer_message');
 			<div class="logininfo">
         <h4>{lang login_now}</h4>
         <p>
-          登录完成后将自动绑定<br/>
-          $profile[provider_name]帐号
+          {lang ezengage:auto_bind_after_login}<br/>
+          $profile[provider_name]{lang ezengage:account}
           $profile[preferred_username]
         </p>
  
