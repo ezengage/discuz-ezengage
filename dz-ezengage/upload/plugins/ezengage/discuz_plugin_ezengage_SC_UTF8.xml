@@ -118,7 +118,7 @@
                 <item id="login_with_ezengage"><![CDATA[你可以使用下面这些网站的帐号登录]]></item>
                 <item id="you_are_using"><![CDATA[您现在正在用]]></item>
                 <item id="account"><![CDATA[帐号]]></item>
-                <item id="for_better_service"><![CDATA[为了让您更好地使用我们提供的服务]]></item>
+                <item id="for_better_service"><![CDATA[为了让您更好地使用我们提供的服务,请提供以下信息:]]></item>
                 <item id="auto_bind_after_login"><![CDATA[登录完成后将自动绑定]]></item>
             </item>
             <item id="installlang">
