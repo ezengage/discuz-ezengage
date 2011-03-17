@@ -37,7 +37,7 @@ if($instype == '') {
     UNIQUE KEY `token` (`token`),
     UNIQUE KEY `identity` (`identity`),
     KEY `uid` (`uid`)
-    ) ENGINE=MyISAM;"
+    ) ENGINE=MyISAM;";
 	runquery($newinstallsql);
 	$finish = TRUE;
 } elseif($instype == 'remain') {

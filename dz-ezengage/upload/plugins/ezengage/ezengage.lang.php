@@ -19,4 +19,13 @@ $templatelang['ezengage'] = array (
     'connect_more_account' => '绑定更多帐号',
     'login_with_ezengage' => '你可以使用下面这些网站的帐号登录',
 );
+
+$installlang['ezengage'] = array(
+    "ask" => "系统检测到您以前安装过本插件，请选择安装方式",
+    "askuninstall"=>"谢谢您的使用，请选择卸载方式",
+    "newinstall"=>"全新安装",
+    "install"=>"保留数据安装",
+    "uninstall"=>"保留数据卸载",
+    "alluninstall"=>"完全卸载",
+);
 ?>

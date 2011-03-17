@@ -2,7 +2,7 @@
 <root>
     <item id="Title"><![CDATA[Discuz! Plugin]]></item>
     <item id="Version"><![CDATA[7.2]]></item>
-    <item id="Time"><![CDATA[2011-03-17 15:24]]></item>
+    <item id="Time"><![CDATA[2011-03-17 15:33]]></item>
     <item id="From"><![CDATA[ezEngage Demo Discuz Site (http://dev_debian/bbs/upload/)]]></item>
     <item id="Data">
         <item id="plugin">
@@ -10,11 +10,11 @@
             <item id="adminid"><![CDATA[1]]></item>
             <item id="name"><![CDATA[ezEngage]]></item>
             <item id="identifier"><![CDATA[ezengage]]></item>
-            <item id="description"><![CDATA[让你的站点支持使用新浪微博,腾讯微博等帐号登录]]></item>
+            <item id="description"><![CDATA[让你的站点支持使用新浪微博,腾讯微博等帐号登录。<br/>具体文档请看下面的地址 <a href="https://github.com/ezengage/ezengage-site/wiki/discuz-plugin" target="_blank">https://github.com/ezengage/ezengage-site/wiki/discuz-plugin</a>]]></item>
             <item id="datatables"><![CDATA[eze_profile]]></item>
             <item id="directory"><![CDATA[ezengage/]]></item>
             <item id="copyright"><![CDATA[ezEngage Team]]></item>
-            <item id="version"><![CDATA[]]></item>
+            <item id="version"><![CDATA[0.1]]></item>
             <item id="__modules">
                 <item id="0">
                     <item id="name"><![CDATA[token]]></item>
@@ -95,6 +95,8 @@
                 <item id="extra"><![CDATA[]]></item>
             </item>
         </item>
+		<item id="installfile"><![CDATA[install.php]]></item>
+		<item id="uninstallfile"><![CDATA[uninstall.php]]></item>
         <item id="language">
             <item id="scriptlang">
                 <item id="bind_success"><![CDATA[帐号连接成功]]></item>
@@ -114,6 +116,14 @@
                 <item id="deleteconfirm"><![CDATA[确认要解除连接?]]></item>
                 <item id="connect_more_account"><![CDATA[绑定更多帐号]]></item>
                 <item id="login_with_ezengage"><![CDATA[你可以使用下面这些网站的帐号登录]]></item>
+            </item>
+            <item id="installlang">
+                <item id="ask"><![CDATA[系统检测到您以前安装过本插件，请选择安装方式]]></item>
+                <item id="askuninstall"><![CDATA[谢谢您的使用，请选择卸载方式]]></item>
+                <item id="newinstall"><![CDATA[全新安装]]></item>
+                <item id="install"><![CDATA[保留数据安装]]></item>
+                <item id="uninstall"><![CDATA[保留数据卸载]]></item>
+                <item id="alluninstall"><![CDATA[完全卸载]]></item>
             </item>
         </item>
     </item>
