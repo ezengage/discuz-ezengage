@@ -39,7 +39,7 @@ display('layer_message');
 	<div class="main"><div class="content nofloat">
 <!--{/if}-->
 <h2>您现在正在用$profile[provider_name]
-帐号$profile[display_name]登录，为了让您更好地使用我们提供的服务，请设置以下信息：</h2>
+帐号 <i>$profile[preferred_username]</i>登录，为了让您更好地使用我们提供的服务，请设置以下信息：</h2>
 <div class="fcontent" id="main_messaqge">
 	<div id="layer_bbrule" class="postbox" style="display: none;">
 		<div>
@@ -69,7 +69,7 @@ display('layer_message');
 							<input type="hidden" name="fromuser"value="$fromuser" />
 						</span>
 					<!--{/if}-->
-					<label><em>{lang username}:</em><input type="text" id="username" name="username" autocomplete="off" size="25" maxlength="15" value="$profile[display_name]" onBlur="checkusername()" tabindex="1" class="txt" /> *</label>
+					<label><em>{lang username}:</em><input type="text" id="username" name="username" autocomplete="off" size="25" maxlength="15" value="$profile[preferred_username]" onBlur="checkusername()" tabindex="1" class="txt" /> *</label>
 					<label><em>{lang password}:</em><input type="password" name="password" size="25" id="password" onkeypress="detectCapsLock(event, this)" tabindex="1" class="txt" /> *</label>
 					<label><em>{lang password_confirm}:</em><input type="password" name="password2" size="25" id="password2" onkeypress="detectCapsLock(event, this)" tabindex="1" value="" class="txt" /> *</label>
 					<label><em>{lang email}:</em><input type="text" name="email" autocomplete="off" size="25" id="email" onBlur="checkemail()" tabindex="1" class="txt" /> *</label>
@@ -111,7 +111,7 @@ display('layer_message');
         <p>
           登录完成后将自动绑定<br/>
           $profile[provider_name]帐号
-          $profile[display_name]
+          $profile[preferred_username]
         </p>
  
 			</div>

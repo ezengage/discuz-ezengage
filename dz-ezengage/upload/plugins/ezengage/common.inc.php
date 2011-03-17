@@ -184,7 +184,6 @@ function eze_get_profiles($uid){
     $eze_profiles = array();
     $query = $db->query("SELECT * FROM {$tablepre}eze_profile WHERE uid='$uid'");
     while($profile = $db->fetch_array($query)) {
-        $profile['provider_name'] = $scriptlang['ezengage']['provider_name_' . $profile['provider_code']];
         $eze_profiles[] = $profile;
     }
     return $eze_profiles;

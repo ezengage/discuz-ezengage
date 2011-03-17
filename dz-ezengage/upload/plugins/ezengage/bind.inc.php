@@ -36,9 +36,8 @@ else{
             "UPDATE {$tablepre}eze_profile SET uid = %d WHERE token = '%s'",
             $discuz_uid, $escaped_token)
         );
-        //showmessage('ezengage:bind_success', 'plugin.php?id=ezengage:accounts'); 
-        dheader("Location: plugin.php?id=ezengage:accounts");
         dsetcookie('eze_token', '');
+        dheader("location: plugin.php?id=ezengage:accounts");
     }
     //否则显示将界面要求登录或注册
     else{

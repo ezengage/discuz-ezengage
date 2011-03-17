@@ -2,8 +2,8 @@
 <root>
     <item id="Title"><![CDATA[Discuz! Plugin]]></item>
     <item id="Version"><![CDATA[7.2]]></item>
-    <item id="Time"><![CDATA[2011-03-15 15:03]]></item>
-    <item id="From"><![CDATA[ezEngage (http://ezengage.com/)]]></item>
+    <item id="Time"><![CDATA[2011-03-17 15:24]]></item>
+    <item id="From"><![CDATA[ezEngage Demo Discuz Site (http://dev_debian/bbs/upload/)]]></item>
     <item id="Data">
         <item id="plugin">
             <item id="available"><![CDATA[1]]></item>
@@ -14,7 +14,7 @@
             <item id="datatables"><![CDATA[eze_profile]]></item>
             <item id="directory"><![CDATA[ezengage/]]></item>
             <item id="copyright"><![CDATA[ezEngage Team]]></item>
-            <item id="version"><![CDATA[0.1]]></item>
+            <item id="version"><![CDATA[]]></item>
             <item id="__modules">
                 <item id="0">
                     <item id="name"><![CDATA[token]]></item>
@@ -23,19 +23,19 @@
                     <item id="displayorder"><![CDATA[0]]></item>
                 </item>
                 <item id="1">
+                    <item id="name"><![CDATA[login]]></item>
+                    <item id="type"><![CDATA[13]]></item>
+                    <item id="adminid"><![CDATA[1]]></item>
+                    <item id="displayorder"><![CDATA[0]]></item>
+                </item>
+                <item id="2">
                     <item id="name"><![CDATA[ezengage]]></item>
                     <item id="type"><![CDATA[11]]></item>
                     <item id="adminid"><![CDATA[0]]></item>
                     <item id="displayorder"><![CDATA[0]]></item>
                 </item>
-                <item id="2">
-                    <item id="name"><![CDATA[bind]]></item>
-                    <item id="type"><![CDATA[13]]></item>
-                    <item id="adminid"><![CDATA[1]]></item>
-                    <item id="displayorder"><![CDATA[0]]></item>
-                </item>
                 <item id="3">
-                    <item id="name"><![CDATA[sync]]></item>
+                    <item id="name"><![CDATA[bind]]></item>
                     <item id="type"><![CDATA[13]]></item>
                     <item id="adminid"><![CDATA[1]]></item>
                     <item id="displayorder"><![CDATA[0]]></item>
@@ -97,15 +97,13 @@
         </item>
         <item id="language">
             <item id="scriptlang">
-                <item id="provider_name_sinaweibo"><![CDATA[新浪微博]]></item>
-                <item id="provider_name_tencentweibo"><![CDATA[腾讯微博]]></item>
-                <item id="provider_name_sohuweibo"><![CDATA[搜狐微博]]></item>
-                <item id="provider_name_neteaseweibo"><![CDATA[网易微博]]></item>
-                <item id="provider_name_renren"><![CDATA[人人网]]></item>
                 <item id="bind_success"><![CDATA[帐号连接成功]]></item>
                 <item id="login_link_label"><![CDATA[通过第三方帐号登录]]></item>
                 <item id="login_link_label_long"><![CDATA[你也可以使用新浪微博，腾讯微博等帐号登录]]></item>
                 <item id="updateuser_succeed"><![CDATA[修改成功]]></item>
+                <item id="sync_checkbox_label"><![CDATA[同步到%s的%s]]></item>
+                <item id="already_bind_to_other_user"><![CDATA[该帐号已经绑定到别的用户了]]></item>
+                <item id="bad_request"><![CDATA[错误的请求，请返回检查你的来路]]></item>
             </item>
             <item id="templatelang">
                 <item id="provider_tencentweibo"><![CDATA[腾讯微博]]></item>
@@ -120,3 +118,4 @@
         </item>
     </item>
 </root>
+
