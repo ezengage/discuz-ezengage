@@ -10,28 +10,22 @@ if(!defined('IN_DISCUZ')) {
 @include_once DISCUZ_ROOT.'./plugins/ezengage/common.inc.php';
 @include_once DISCUZ_ROOT.'./plugins/ezengage/ezengage.lang.php';
 
-unset($name, $directory, $vars);
-
-extract($_DPLUGIN[$identifier], EXTR_SKIP);
-extract($vars);
-
-$token = $_GET['token'];
+$token = authcode($_DCOOKIE['eze_token'], 'DECODE');
 
 $escaped_token = mysql_real_escape_string($token);
 $profile = $db->fetch_first("SELECT * FROM {$tablepre}eze_profile WHERE token='{$escaped_token}'");
 
 if(!$profile){
-    exit('Bad Request');
+    showmessage('ezengage:bad_request', 'plugin.php?id=ezengage:accounts');
 }
-$profile['provider_name'] = $scriptlang['ezengage']['provider_name_' . $profile['provider_code']];
 
 if($profile['uid'] > 0){
     if($discuz_uid && $profile['uid'] != $discuz_uid){
-        showmessage('ezengage:already_bind_to_other_uer');
-        //dheader("Location: plugin.php?id=ezengage:login");
-        //die('bad request');
+        dsetcookie('eze_token', '');
+        showmessage('ezengage:already_bind_to_other_user', 'plugin.php?id=ezengage:accounts');
     }
     else if(eze_login_user($profile['uid'])){
+        dsetcookie('eze_token', '');
         showmessage('login_succeed', $indexname);
     } 
 }
@@ -44,6 +38,7 @@ else{
         );
         //showmessage('ezengage:bind_success', 'plugin.php?id=ezengage:accounts'); 
         dheader("Location: plugin.php?id=ezengage:accounts");
+        dsetcookie('eze_token', '');
     }
     //否则显示将界面要求登录或注册
     else{

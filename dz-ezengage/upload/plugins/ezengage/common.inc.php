@@ -107,7 +107,6 @@ function eze_sync_checkbox_wrapper($uid, $show = true){
     $eze_profiles = array();
     $query = $db->query("SELECT * FROM {$tablepre}eze_profile WHERE uid=$uid;");
     while($profile = $db->fetch_array($query)) {
-        $profile['provider_name'] = $scriptlang['ezengage']['provider_name_' . $profile['provider_code']];
         $eze_profiles[] = $profile;
     }
     $html = array(

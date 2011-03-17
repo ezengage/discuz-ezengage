@@ -26,6 +26,7 @@ if($instype == '') {
     `uid` mediumint(8) unsigned NOT NULL default '0',
     `identity` varchar(255) NOT NULL,
     `provider_code` varchar(15) NOT NULL,
+    `provider_name` varchar(50) NOT NULL,
     `preferred_username` varchar(100) NOT NULL default '',
     `display_name` varchar(100) NOT NULL default '',
     `avatar_url` varchar(255) NOT NULL default '',

@@ -1,10 +1,8 @@
 <?php
-@include_once DISCUZ_ROOT.'./plugins/ezengage/apiclient.php';
-
 if(!defined('IN_DISCUZ')) {
     exit('Access Denied');
 }
-
+@include_once DISCUZ_ROOT.'./plugins/ezengage/apiclient.php';
 @include_once DISCUZ_ROOT.'./forumdata/cache/plugin_ezengage.php';
 
 class plugin_ezengage {
