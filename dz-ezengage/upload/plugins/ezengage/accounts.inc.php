@@ -1,8 +1,6 @@
 <?php
-
 /*
 	ezEngage (C)2011  http://ezengage.com
-	$Id: accounts.inc.php ftao $
 */
 
 if(!defined('IN_DISCUZ')) {

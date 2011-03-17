@@ -1,10 +1,17 @@
 <?php
+/*
+	ezEngage (C)2011  http://ezengage.com
+*/
+
 if(!defined('IN_DISCUZ')) {
 	exit('Access Denied');
 }
 
 @include_once DISCUZ_ROOT.'./forumdata/cache/plugin_ezengage.php';
 $G_EZE_OPTIONS = $_DPLUGIN['ezengage']['vars'];
+if(!isset($G_EZE_OPTIONS['eze_auto_register'])){
+    $G_EZE_OPTIONS['eze_auto_register'] = TRUE;
+}
 @require_once DISCUZ_ROOT.'./forumdata/plugins/ezengage.lang.php';
 
 /**

@@ -1,4 +1,8 @@
 <?php
+/*
+	ezEngage (C)2011  http://ezengage.com
+*/
+
 if(!defined('IN_DISCUZ')) {
 	exit('Access Denied');
 }

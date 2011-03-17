@@ -3,7 +3,7 @@
     <item id="Title"><![CDATA[Discuz! Plugin]]></item>
     <item id="Version"><![CDATA[7.2]]></item>
     <item id="Time"><![CDATA[2011-03-15 15:03]]></item>
-    <item id="From"><![CDATA[ezEngage Demo Discuz Site (http://dev_debian/bbs/upload/)]]></item>
+    <item id="From"><![CDATA[ezEngage (http://ezengage.com/)]]></item>
     <item id="Data">
         <item id="plugin">
             <item id="available"><![CDATA[1]]></item>
@@ -64,7 +64,7 @@
                 <item id="description"><![CDATA[]]></item>
                 <item id="variable"><![CDATA[eze_app_key]]></item>
                 <item id="type"><![CDATA[text]]></item>
-                <item id="value"><![CDATA[a94548476f247a7e8835b1dd1bee7293]]></item>
+                <item id="value"><![CDATA[]]></item>
                 <item id="extra"><![CDATA[]]></item>
             </item>
             <item id="1">
@@ -73,7 +73,7 @@
                 <item id="description"><![CDATA[]]></item>
                 <item id="variable"><![CDATA[eze_app_id]]></item>
                 <item id="type"><![CDATA[text]]></item>
-                <item id="value"><![CDATA[79287033]]></item>
+                <item id="value"><![CDATA[]]></item>
                 <item id="extra"><![CDATA[]]></item>
             </item>
             <item id="2">
@@ -82,7 +82,7 @@
                 <item id="description"><![CDATA[]]></item>
                 <item id="variable"><![CDATA[eze_app_domain]]></item>
                 <item id="type"><![CDATA[text]]></item>
-                <item id="value"><![CDATA[ezengage]]></item>
+                <item id="value"><![CDATA[]]></item>
                 <item id="extra"><![CDATA[]]></item>
             </item>
             <item id="3">

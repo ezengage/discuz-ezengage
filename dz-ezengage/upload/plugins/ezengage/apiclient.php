@@ -1,5 +1,9 @@
 <?php
-//这是一个简单实现了token 处理流程的简单的PHP5 脚本
+/*
+	ezEngage (C)2011  http://ezengage.com
+*/
+
+@include_once DISCUZ_ROOT.'./plugins/ezengage/httpclient.class.php';
 
 class EzEngageApiClient {
     public $timeout = 30; 
@@ -18,7 +22,6 @@ class EzEngageApiClient {
         $url = $this->api_base_url . 'profile.' . $this->format . 
                '?app_key=' . urlencode($this->app_key) . '&token='. urlencode($token); 
         list($status_code, $content) = $this->http($url, 'GET');
-        print $content;
         if($status_code == 200){
             $profile = json_decode($content, true);     
             $this->last_response =  array($status_code, $content); 
@@ -48,6 +51,35 @@ class EzEngageApiClient {
      * @return array(int, string) status_code and response body
      */ 
     function http($url, $method, $payload = NULL) { 
+        #TODO open curl
+        if(false && function_exists('curl_init')){
+            return $this->http_curl($url, $method, $payload);
+        }        
+        else{
+            return $this->http_fsock($url, $method, $payload);
+        }
+    }
+
+    function http_fsock($url, $method, $payload){
+        $bits = parse_url($url);
+        $host = $bits['host'];
+        $port = isset($bits['port']) ? $bits['port'] : 80;
+        $path = isset($bits['path']) ? $bits['path'] : '/';
+        if (isset($bits['query'])) {
+            $path .= '?'.$bits['query'];
+        }
+        $client = new HttpClient($host, $port);
+        $client->setDebug(True);
+        if($method == 'GET'){
+            $client->get($path);
+        }
+        else{
+            $client->post($path, $payload);
+        }
+        return array($client->getStatus(), $client->getContent());
+    }
+
+    function http_curl($url, $method, $payload){
         $ci = curl_init(); 
         curl_setopt($ci, CURLOPT_CONNECTTIMEOUT, $this->connecttimeout); 
         curl_setopt($ci, CURLOPT_TIMEOUT, $this->timeout); 
