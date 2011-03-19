@@ -1,0 +1,32 @@
+<form method="post" autocomplete="off" action="home.php?mod=spacecp&ac=plugin&id=ezengage:accounts&pluginop=update">
+<input type="hidden" name="formhash" value="{FORMHASH}" />
+<table cellspacing="0" cellpadding="0" class="tfm" style="table-layout:fixed;margin-top:10px;">
+<thead class="alt">
+  <tr><td width="40"></td><td>{lang ezengage:provider}</td><td width="300">{lang ezengage:provider_username}</td><td>{lang ezengage:should_sync}</td></tr>
+</thead>
+<!--{if $eze_profiles}-->
+  <!--{loop $eze_profiles $profile}-->
+  <tr>
+    <td><input name="delete[]" type="checkbox" class="checkbox" value="$profile[pid]" /></td>
+    <td>$profile[provider_name]</td>
+    <td>$profile[preferred_username]</td>
+    <td>
+        <!-- {if $profile[should_sync]} -->
+          <input name="should_sync[]" type="checkbox" class="checkbox" checked="checked" value="$profile[pid]" />
+        <!-- {else} -->
+          <input name="should_sync[]" type="checkbox" class="checkbox" value="$profile[pid]" />
+        <!-- {/if} -->
+    </td>
+  </tr>
+  <!--{/loop}-->
+  <tr><td><input class="checkbox" type="checkbox" id="chkall" name="chkall" onclick="checkall(this.form);" /> <label for="chkall">{lang ezengage:delete_check}</label></td>
+  <td><button type="submit" class="submit" name="updateuser" value="yes" >{lang submit}</button></td></tr>
+<!--{/if}-->
+</table>
+</form>
+<br/>
+<br/>
+<h2>{lang ezengage:connect_more_account}</h2>
+<div>
+{eval eze_login_widget_output('normal', 350, 190);}
+</div>

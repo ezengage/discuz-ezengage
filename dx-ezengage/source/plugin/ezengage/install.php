@@ -4,25 +4,23 @@ if(!defined('IN_DISCUZ') || !defined('IN_ADMINCP')) {
 }
 
 $inslang = $installlang['ezengage'];
-$installurl = "$BASESCRIPT?action=plugins&operation=$operation&dir=$dir&installtype=$installtype&instype=";
-$sql = "SHOW TABLES LIKE '%eze_profile%'";
-$check = $db->fetch_array($db->query($sql));
-$tag = 'Tables_in_'.$dbname.' (%eze_profile%)';
+$installurl = "{$_G[basefilename]}?action=plugins&operation=$operation&dir=$dir&installtype=$installtype&instype=";
+$sql = "SHOW TABLES LIKE '%eze_profile'";
+$check = DB::num_rows(DB::query($sql));
 
-$instype = $_GET['instype'];
-if(!$check[$tag]){
-	$instype = 'new';
+$instype = strval($_GET['instype']);
+if($check <= 0){
+    $instype = 'new';
 }
-die('aaa');
 
 if($instype == '') {
-	cpmsg($inslang['ask'], '', 'succeed',
-	"<input type=\"button\" class=\"btn\" value=\" $inslang[newinstall] \" $disabledv1 onclick=\"javascript: window.location.href='{$installurl}new';\" /> &nbsp; ".
-	"<input type=\"button\" class=\"btn\" value=\" $inslang[install] \" $disabledv2 onclick=\"javascript: window.location.href='{$installurl}remain';\" />");
+	cpmsg($inslang['ask'], '', 'succeed', null,
+        "<input type=\"button\" class=\"btn\" value=\" $inslang[newinstall] \" onclick=\"javascript: window.location.href='{$installurl}new';\" /> &nbsp; ".
+	"<input type=\"button\" class=\"btn\" value=\" $inslang[install] \" onclick=\"javascript: window.location.href='{$installurl}remain';\" />");
 } elseif($instype == 'new') {
 	$newinstallsql = "
-	DROP TABLE IF EXISTS `{$tablepre}eze_profile`;
-    CREATE TABLE `{$tablepre}eze_profile` (
+	DROP TABLE IF EXISTS `cdb_eze_profile`;
+    CREATE TABLE `cdb_eze_profile` (
     `pid` mediumint(8) NOT NULL auto_increment,
     `token` varchar(50) NOT NULL,
     `uid` mediumint(8) unsigned NOT NULL default '0',

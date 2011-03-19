@@ -1,0 +1,32 @@
+{template member/register}
+<p id="eze_reg_tip">
+{lang ezengage:you_are_using}$profile[provider_name]
+{lang ezengage:account}<i>$profile[preferred_username]</i>.  
+{lang ezengage:for_better_service}
+</p>
+<p id="eze_login_tip">
+  {lang ezengage:auto_bind_after_login}<br/>
+  $profile[provider_name]{lang ezengage:account}
+  $profile[preferred_username]
+</p>
+<script type="text/javascript">
+document.getElementById('username').value = '$profile[preferred_username]';
+var _eze_reg_tip = document.getElementById('layer_reginfo_t');
+var _tip = document.getElementById('eze_reg_tip');
+_tip.parentNode.removeChild(_tip);
+_eze_reg_tip.parentNode.insertBefore(_tip, _eze_reg_tip);
+
+var _eze_divs = document.getElementById('layer_reg').getElementsByTagName('div');
+for(var i = 0; i < _eze_divs.length; ++i){
+  var _eze_login_tip = _eze_divs.item(i);
+  if(_eze_login_tip.nodeName.toUpperCase() == 'DIV' && 
+      _eze_login_tip.className.indexOf('lgf') >= 0 &&
+      _eze_login_tip.className.indexOf('lgfm') < 0 ){
+    _eze_login_tip = _eze_login_tip.getElementsByTagName('h4').item(0);
+    var _tip = document.getElementById('eze_login_tip');
+    _tip.parentNode.removeChild(_tip);
+    _eze_login_tip.appendChild(_tip);
+    break;
+  }
+}
+</script>
