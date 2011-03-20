@@ -62,72 +62,6 @@ class plugin_ezengage {
     }
 
 /*
-    //在快速回复的地方加入同步的选择框
-    function viewthread_bottom_output(){
-        global $G_EZE_OPTIONS;
-        if($G_EZE_OPTIONS['eze_disable_auto_modify_template']){
-            return '';
-        }
-        global $db,$discuz_uid,$tablepre;
-        global $action;
-        if($discuz_uid <= 0 ){
-            return '';
-        }
-        $html = eze_sync_checkbox_wrapper($discuz_uid, false);
-        $script = <<<EOT
-            <script type='text/javascript'>
-            try{
-                var _target = document.getElementById('fastpostsubmit').parentNode;
-                _eze_div = document.getElementById('eze_sync_checkbox_wrapper')
-                _eze_div.parentNode.removeChild(_eze_div)
-                _target.parentNode.insertBefore(_eze_div, _target); 
-                display('eze_sync_checkbox_wrapper');
-            }
-            catch(e){
-            }
-            </script>
-EOT;
-        return $html . $script;
-    }
-
- 	function post_bottom_output() {
-        global $G_EZE_OPTIONS;
-        if($G_EZE_OPTIONS['eze_disable_auto_modify_template']){
-            return '';
-        }
- 
-        global $db,$discuz_uid,$tablepre;
-        global $action;
-        if($discuz_uid <= 0 ){
-            return '';
-        }
-        //只有新发帖才同步，编辑不同步
-        if($action != 'newthread' && $action != 'reply'){
-            return '';
-        }
-
-        $html = eze_sync_checkbox_wrapper($discuz_uid, false);
-
-        $script = <<<EOT
-            <script type='text/javascript'>
-            try{
-                var _eze_btn_bar = document.getElementById('postsubmit').parentNode;
-                var _target = _eze_btn_bar.previousSibling;
-                while(_target.nodeName.toUpperCase() != 'DIV'){
-                    _target = _target.previousSibling;
-                }
-                _eze_div = document.getElementById('eze_sync_checkbox_wrapper')
-                _eze_div.parentNode.removeChild(_eze_div)
-                _target.appendChild(_eze_div);
-                display('eze_sync_checkbox_wrapper');
-            }
-            catch(e){
-            }
-            </script>
-EOT;
-        return $html . $script;
-    }
-
  	function global_footerlink() {
         global $G_EZE_OPTIONS;
         if($G_EZE_OPTIONS['eze_disable_auto_modify_template']){
@@ -139,6 +73,204 @@ EOT;
 */
 }
 	
+class plugin_ezengage_forum extends plugin_ezengage {
+
+    var $insert_sync_checkbox_script = "
+        <script type='text/javascript'>
+        try{
+            function _add_eze_checkbox_wrapper(){
+                var _target = document.getElementById('fastpostsubmit').parentNode;
+                _eze_div = document.getElementById('eze_sync_checkbox_wrapper')
+                _eze_div.parentNode.removeChild(_eze_div)
+                _target.parentNode.insertBefore(_eze_div, _target); 
+                display('eze_sync_checkbox_wrapper');
+            }
+            _attachEvent(window, 'load', _add_eze_checkbox_wrapper, null);
+        }
+        catch(e){
+        }
+        </script>
+    ";
+
+    function plugin_ezengage_forum() { 
+        $this->__construct();
+    } 
+
+    function __construct() { 
+        parent::__construct(); 
+    } 
+
+    function post_middle(){
+        global $_G;
+        if($_G['uid']){
+            return eze_sync_checkbox_wrapper($_G['uid'], $_G['gp_action']);
+        }
+    }
+
+    function forumdisplay_fastpost_content(){
+        global $_G;
+        if(!$_G['uid']){
+            return '';
+        }
+        $html = eze_sync_checkbox_wrapper($_G['uid'], 'newthread', false);
+        return $html . $this->insert_sync_checkbox_script;
+    }
+
+    function viewthread_fastpost_content(){
+        global $_G;
+        if(!$_G['uid']){
+            return '';
+        }
+        $html = eze_sync_checkbox_wrapper($_G['uid'], 'reply', false);
+        return $html . $this->insert_sync_checkbox_script;
+    }
+
+    function post_register_shutdown(){
+        global $_G;
+        if(count($_G['gp_eze_should_sync']) > 0){
+            register_shutdown_function(array('plugin_ezengage_forum', '_sync_post'));
+        }
+    }
+
+    static function _sync_post(){
+        global $_G;
+        $pid = isset($GLOBALS['pid'])  ? (int)$GLOBALS['pid'] : 0;
+        if($pid >= 1){
+            $event = $_G['gp_eze_sync_event'];
+            if($event == 'newthread'){
+                eze_publisher::sync_newthread($pid, $_G['gp_eze_should_sync']);
+            }
+            else if($event == 'reply'){
+                eze_publisher::sync_reply($pid, $_G['gp_eze_should_sync']);
+            }
+        }
+    }
+}
+
+class plugin_ezengage_home extends plugin_ezengage{
+
+    function plugin_ezengage_home() { 
+        $this->__construct();
+    } 
+
+    function __construct() { 
+        parent::__construct(); 
+    } 
+
+    function spacecp_bottom(){
+        global $_G;
+        if(!$_G['uid']){
+            return '';
+        }
+        if($_G['gp_ac'] == 'blog'){
+            $html = eze_sync_checkbox_wrapper($_G['uid'], 'newblog', false);
+            $script = "
+            <script type='text/javascript'>
+            try{
+                function _add_eze_checkbox_wrapper(){
+                    var _target = document.getElementById('ttHtmlEditor')
+                    _eze_div = document.getElementById('eze_sync_checkbox_wrapper')
+                    _eze_div.parentNode.removeChild(_eze_div)
+                    _target.appendChild(_eze_div); 
+                    display('eze_sync_checkbox_wrapper');
+                }
+                _add_eze_checkbox_wrapper();
+            }
+            catch(e){
+            }
+            </script>
+            ";
+            return $html . $script;
+        }
+    }
+
+    function space_share_bottom(){
+        global $_G;
+        if(!$_G['uid']){
+            return '';
+        }
+        $html = eze_sync_checkbox_wrapper($_G['uid'], 'newshare', false);
+        $script = "
+        <script type='text/javascript'>
+        try{
+            function _add_eze_checkbox_wrapper(){
+                var _target = document.getElementById('shareform')
+                _eze_div = document.getElementById('eze_sync_checkbox_wrapper')
+                _eze_div.parentNode.removeChild(_eze_div)
+                _target.appendChild(_eze_div); 
+                display('eze_sync_checkbox_wrapper');
+            }
+            _add_eze_checkbox_wrapper();
+        }
+        catch(e){
+        }
+        </script>
+        ";
+        return $html . $script;
+    }
+
+    function space_doing_bottom(){
+        global $_G;
+        if(!$_G['uid']){
+            return '';
+        }
+        $html = eze_sync_checkbox_wrapper($_G['uid'], 'newdoing', false);
+        $script = "
+        <script type='text/javascript'>
+        try{
+            function _add_eze_checkbox_wrapper(){
+                var _target = document.getElementById('mood_addform')
+                _eze_div = document.getElementById('eze_sync_checkbox_wrapper')
+                _eze_div.parentNode.removeChild(_eze_div)
+                _target.appendChild(_eze_div); 
+                display('eze_sync_checkbox_wrapper');
+            }
+            _add_eze_checkbox_wrapper();
+            //_attachEvent(window, 'load', _add_eze_checkbox_wrapper, null);
+        }
+        catch(e){
+        }
+        </script>
+        ";
+        return $html . $script;
+    }
+
+    function spacecp_register_shutdown(){
+        global $_G;
+        if(count($_G['gp_eze_should_sync']) > 0){
+            $func = array('plugin_ezengage_home', '_sync_' . strval($_G['gp_eze_sync_event']));
+            if(is_callable($func)){
+                register_shutdown_function($func);
+            }
+        }
+    }
+
+    static function _sync_newshare(){
+        global $_G;
+        $arr = isset($GLOBALS['arr']) ? (array)$GLOBALS['arr'] : array();
+        $sid = isset($GLOBALS['sid']) ? (int)$GLOBALS['sid'] : 0; 
+        if($sid >= 1){
+            eze_publisher::sync_newshare($sid, $arr, $_G['gp_eze_should_sync']);
+        }
+    }
+
+    static function _sync_newblog(){
+        global $_G;
+        $blogid = isset($GLOBALS['newblog']['blogid']) ? (int)$GLOBALS['newblog']['blogid'] : 0;
+        if($blogid >= 1){
+            eze_publisher::sync_newblog($blogid, $_G['gp_eze_should_sync']);
+        }
+    }
+
+    static function _sync_newdoing(){
+        global $_G;
+        $doid = isset($GLOBALS['newdoid'])  ? (int)$GLOBALS['newdoid'] : 0;
+        if($doid >= 1){
+            eze_publisher::sync_newdoing($doid, $_G['gp_eze_should_sync']);
+        }
+    }
+}
+
 class plugin_ezengage_member extends plugin_ezengage{
 
     function plugin_ezengage_member() { 

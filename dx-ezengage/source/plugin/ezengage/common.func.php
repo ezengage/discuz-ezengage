@@ -7,44 +7,15 @@ if(!defined('IN_DISCUZ')) {
 	exit('Access Denied');
 }
 
-$G_EZE_OPTIONS = $_G['cache']['plugin']['ezengage'];
-if(!isset($G_EZE_OPTIONS['eze_auto_register'])){
-    $G_EZE_OPTIONS['eze_auto_register'] = TRUE;
-}
-#include_once DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php';
+define(EZE_ALL_SYNC_LIST, 'newthread,newblog,newshare,newdoing,reply,blogcomment,sharecomment,dogingcomment');
+define(EZE_DEFAULT_SYNC_LIST, 'newthread,newblog,newshare,newdoing');
 
+//$G_EZE_OPTIONS = $_G['cache']['plugin']['ezengage'];
+//if(!isset($G_EZE_OPTIONS['eze_auto_register'])){
+//    $G_EZE_OPTIONS['eze_auto_register'] = TRUE;
+//}
 
-/**
- * 同步帖子
- * @pid post pid
- * @should_sync profile pid array
- */
-function eze_sync_post($pid, $should_sync){
-    global $G_EZE_OPTIONS;
-    global $tablepre;
-    global $db;
-    if(count($should_sync) <= 0){
-        return;
-    }
-    //TODO raise error  
-    if(empty($G_EZE_OPTIONS['eze_app_key'])){
-        return ;
-    }
-    $ezeApiClient = new EzEngageApiClient($G_EZE_OPTIONS['eze_app_key']);
-    $post = $db->fetch_first("SELECT tid,pid,authorid,subject,message FROM {$tablepre}posts WHERE pid={$pid};");
-    if(!$post){
-        return;
-    }
-    $uid = $post['authorid'];
-    //这里可能可以优化
-    $status = eze_format_status($post);
-    foreach($should_sync as $profile_id){
-        $row = $db->fetch_first("SELECT identity FROM " . DB::table('eze_profile') . " WHERE uid={$uid} AND pid={$profile_id}");
-        if($row){
-            $ret = $ezeApiClient->updateStatus($row['identity'], $status);
-        }
-    }
-}
+//utils 
 
 function eze_convert($source, $in, $out){
     $in = strtoupper($in);
@@ -54,12 +25,12 @@ function eze_convert($source, $in, $out){
     if ($out == "UTF8"){
         $out = "UTF-8";
     }       
-    if( $in==$out ){
+    if( $in == $out ){
         return $source;
     }   
     if(function_exists('mb_convert_encoding')) {
         return mb_convert_encoding($source, $out, $in );
-    }elseif (function_exists('iconv'))  {
+    } elseif (function_exists('iconv'))  {
         return iconv($in,$out."//IGNORE", $source);
     }   
     return $source;
@@ -78,6 +49,7 @@ function eze_filter($content) {
     }
     //smiles
     $re = $_DCACHE['smileycodes'];
+    //FIXME 
     $_DCACHE['smilies']['searcharray'] = isset($_DCACHE['smilies']['searcharray']) ? $_DCACHE['smilies']['searcharray'] : array();
     $content = str_replace($re, '', $content);
     $content = preg_replace($_DCACHE['smilies']['searcharray'], '', $content);
@@ -85,16 +57,15 @@ function eze_filter($content) {
 }
 
 function eze_format_status($post){
-    global $siteurl; 
-    global $charset;
+    global $_G;
     if($post['first']){
-        $url = $siteurl . "viewthread.php?tid=$post[tid]";
+        $url = $_G['siteurl'] . "forum.php?mod=viewthread.php&tid=$post[tid]";
     }
     else{
-        $url = $siteurl . "redirect.php?goto=findpost&pid=$post[pid]&ptid=$post[tid]";
+        $url = $_G['siteurl'] . "forum.php?mod=redirect&goto=findpost&pid=$post[pid]&ptid=$post[tid]";
     }
     $status = $post['subject'] . ' ' . $post['message'];
-    $status = eze_convert($status, $charset, 'UTF-8');
+    $status = eze_convert($status, $_G['charset'], 'UTF-8');
     $status = eze_filter($status);
     $status = $url . ' ' . $status;
     #这里的截断只是为了防止大文章时发送过大的数据。
@@ -102,26 +73,30 @@ function eze_format_status($post){
     return $status;
 }
 
-function eze_sync_checkbox_wrapper($uid, $show = true){
-    global $db,$tablepre,$scriptlang;
+function eze_sync_checkbox_wrapper($uid, $event, $show = true){
+    global $_G;
+    include(DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php');
+
     $eze_profiles = array();
-    $query = $db->query("SELECT * FROM " . DB::table('eze_profile') . " WHERE uid=$uid;");
-    while($profile = $db->fetch_array($query)) {
+    $query = DB::query("SELECT * FROM " . DB::table('eze_profile') . " WHERE uid=$uid;");
+    while($profile = DB::fetch($query)) {
         $eze_profiles[] = $profile;
     }
     $html = array(
         '<div id="eze_sync_checkbox_wrapper" style="margin-bottom:5px;' . ($show ? '':'display:none') . '">',
     );
     foreach($eze_profiles as $profile){
-        if($profile['should_sync']){
-            $html[] = "<input name='eze_should_sync[]' type='checkbox' class='checkbox' checked='checked' value='$profile[pid]' />";
-        }
-        else{
+        if(strpos($profile['sync_list'], $event) === FALSE){
             $html[] = "<input name='eze_should_sync[]' type='checkbox' class='checkbox' value='$profile[pid]' />";
         }
-        $html[] =  sprintf($scriptlang['ezengage']['sync_checkbox_label'], $profile['provider_name'], $profile['display_name']);
+        else{
+            $html[] = "<input name='eze_should_sync[]' type='checkbox' class='checkbox' checked='checked' value='$profile[pid]' />";
+        }
+        $html[] =  sprintf($scriptlang['ezengage']['sync_checkbox_label'], $profile['provider_name'], $profile['preferred_username']);
     }
-    $html[] = '</div>';
+    $html[] = "<input type='hidden' name='eze_include_sync_options' value='1'/>";
+    $html[] = "<input type='hidden' name='eze_sync_event' value='$event'/>";
+    $html[] = "</div>";
     $html = implode('', $html);
     return $html;
 }
@@ -174,7 +149,28 @@ function eze_login_widget($style = 'normal', $width = 'auto', $height = 'auto'){
 function eze_login_widget_output($style = 'normal', $width = 'auto', $height = 'auto'){
     echo eze_login_widget($style, $width, $height);
 }
+function eze_sync_list($profile){
+    include(DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php');
+    $html = array();
+    foreach(explode(',', EZE_ALL_SYNC_LIST) as $sync_item){
+        if (strpos($profile['sync_list'], $sync_item) === FALSE){
+            $html[] = "<input name='eze_sync_list_{$profile[profile_id]}[]' type='checkbox' class='checkbox'
+                       value='$syc_item' />";
+        }
+        else{
+            $html[] = "<input name='eze_sync_list_{$profile[profile_id]}[]' type='checkbox' class='checkbox'
+                       value='$syc_item' checked='checked' />";
+        }
+        $html[] = $scriptlang['ezengage']['sync_name_' . $sync_item];
+    }
+    $html = implode(' ', $html);
+    return $html;
+}
 
+function eze_sync_list_output($profile){
+    print eze_sync_list($profile);
+}
+ 
 function eze_get_profiles($uid){
     global $_G;
     $eze_profiles = array();
@@ -199,33 +195,97 @@ function eze_current_profile(){
     return $profile;
 }
 
-function eze_bind_user(){
-    global $_G;
-    if(empty($_G['cookie']['eze_token'])){
-        return;
-    }
-    if(!$_G['uid']){
-        return;
-    }
-    $token = authcode($_G['cookie']['eze_token'], 'DECODE');
-    if($token){
-        $ret = $db->query(sprintf(
-            "UPDATE " . DB::table("eze_profile") . " SET uid = %d WHERE token = '%s'",
-            $_G['uid'], $escaped_token)
-        );
-        dsetcookie('eze_token', '');
-        dheader("location: home.php?mod=spacecp&ac=plugin&id=ezengage:accounts");
-    }
-}
+class eze_publisher {
 
-function eze_trigger($event){
-    if($event == 'newthread' || $event == 'newreply'){
-        global $db,$discuz_uid,$tablepre;
-        global $pid,$action;
-        global $eze_should_sync;
-        if($pid && $eze_should_sync){
-            eze_sync_post(intval($pid), $eze_should_sync);
+    //同步主题
+    static function sync_newthread($pid, $sync_to){
+       self::sync_post($pid, $sync_to); 
+    }
+
+    //同步回复
+    static function sync_reply($pid, $sync_to){
+       self::sync_post($pid, $sync_to); 
+    }
+
+    //同步主题或回复
+    static function sync_post($pid, $sync_to){
+        $post = DB::fetch_first("SELECT tid,pid,authorid,subject,message,first FROM " . DB::table('forum_post') . " WHERE pid={$pid};");
+        if(!$post){
+            return;
+        }
+        $uid = $post['authorid'];
+        $status = eze_format_status($post);
+        self::publish($uid, $sync_to, $status);
+    } 
+
+    //同步记录
+    static function sync_newdoing($doid, $sync_to){
+        $doing = DB::fetch_first("SELECT uid,doid,message FROM " . DB::table('home_doing') . " WHERE doid={$doid};");
+        if(!$doing){
+            return;
+        }
+        $status = self::format_doing_status($doing);
+        self::publish($doing['uid'], $sync_to, $status);
+    }
+
+    static function format_doing_status($doing){
+        $status = eze_convert($doing['message'], $_G['charset'], 'UTF-8');
+        $status = eze_filter($status);
+        $status = substr($status, 0, 1000);
+        return $status;
+    }
+
+    //同步Blog
+    static function sync_newblog($blogid, $sync_to){
+        $blog = DB::fetch_first("SELECT blogid,uid,subject FROM " . DB::table('home_blog') . " WHERE blogid={$blogid}");
+        if(!$blog){
+            return;
+        }
+        $status = self::format_blog_status($blog);
+        self::publish($blog['uid'], $sync_to, $status);
+    }
+
+    static function format_blog_status($blog){
+        global $_G;
+        $status = eze_convert($blog['subject'], $_G['charset'], 'UTF-8');
+        $link = $_G['siteurl']. "home.php?mod=space&uid={$blog[uid]}&do=blog&id={$blog[blogid]}";
+        $status = eze_filter($status);
+        $status = $link . ' ' . $status;
+        $status = substr($status, 0, 1000);
+        return $status;
+    }
+
+    //同步Share
+    static function sync_newshare($sid, $arr, $sync_to){
+        $share = DB::fetch_first("SELECT sid,uid,type,title_template,body_general FROM " . DB::table('home_share') . " WHERE sid={$sid}");
+        $status = self::format_share_status($share);
+        self::publish($share['uid'], $sync_to, $status);
+    }
+
+    static function format_share_status($share){
+        global $_G;
+        $status = !empty($share['body_general']) ? (string)$share['body_general'] : (string)$share['title_template'];
+        //TODO fix this, check type 
+        $status = eze_convert($status, $_G['charset'], 'UTF-8');
+        $status = eze_filter($status);
+        $status = substr($status, 0, 1000);
+        return $status;
+    }
+
+
+    //将内容发布出去,所有的同步内容最终通过这个函数发布
+    static function publish($uid, $sync_to, $status){
+        global $_G;
+        $eze_app_key = $_G['cache']['plugin']['ezengage']['eze_app_key'];
+        if(empty($eze_app_key)){
+            return ;
+        }
+        $ezeApiClient = new EzEngageApiClient($eze_app_key);
+        foreach($sync_to as $profile_id){
+            $row = DB::fetch_first("SELECT identity FROM " . DB::table('eze_profile') . " WHERE uid={$uid} AND pid={$profile_id}");
+            if($row){
+                $ret = $ezeApiClient->updateStatus($row['identity'], $status);
+            }
         }
     }
 }
-

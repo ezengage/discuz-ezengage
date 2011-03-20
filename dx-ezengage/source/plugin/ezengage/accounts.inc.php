@@ -1,6 +1,7 @@
 <?php
 /*
 	ezEngage (C)2011  http://ezengage.com
+    这个文件显示用户绑定的帐号，并允许设置同步那些东西，或者解除绑定。
 */
 
 if(!defined('IN_DISCUZ')) {
@@ -28,6 +29,7 @@ if($_G['gp_pluginop'] == 'update' && submitcheck('updateuser')) {
 }
 	
 $eze_profiles = eze_get_profiles($_G[uid]);
+$eze_all_sync_list_array = explode(',', EZE_ALL_SYNC_LIST);
 
 $_G['basescript'] = 'home';
 ?>

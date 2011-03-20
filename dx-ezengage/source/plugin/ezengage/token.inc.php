@@ -38,13 +38,12 @@ $row = DB::fetch_first("SELECT token,uid,identity FROM " . DB::table('eze_profil
 if(!$row){
     $token = md5($_POST['token'] . time());
     $ret = DB::query(sprintf(
-        "INSERT INTO " . DB::table('eze_profile') . " (token,uid,identity,provider_code,provider_name,preferred_username,display_name,avatar_url,profile_json) VALUES('%s', %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s');",
+        "INSERT INTO " . DB::table('eze_profile') . " (token,uid,identity,provider_code,provider_name,preferred_username,avatar_url,sync_list) VALUES('%s', %d, '%s', '%s', '%s', '%s', '%s', '%s');",
         $token, 0, mysql_real_escape_string($profile['identity']), mysql_real_escape_string($profile['provider_code']),
         mysql_real_escape_string($profile['provider_name']),
         mysql_real_escape_string($profile['preferred_username']),
-        mysql_real_escape_string($profile['display_name']),
         mysql_real_escape_string($profile['avatar_url']),
-        json_encode($profile)
+        EZE_DEFAULT_SYNC_LIST
     ));
 }
 else{
