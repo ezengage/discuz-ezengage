@@ -13,6 +13,7 @@ define(EZE_ALL_SYNC_LIST, 'newthread,newblog,newshare,newdoing,reply,blogcomment
 define(EZE_DEFAULT_SYNC_LIST, 'newthread,newblog,newshare,newdoing');
 define(EZE_MY_ACCOUNT_URL, 'home.php?mod=spacecp&ac=plugin&id=ezengage:accounts');
 
+//转换编码
 function eze_convert($source, $in, $out){
     $in = strtoupper($in);
     if ($in == "UTF8"){
@@ -32,6 +33,7 @@ function eze_convert($source, $in, $out){
     return $source;
 }   
 
+//过滤
 function eze_filter($content) {
     global $_G;
     //attach 
@@ -69,16 +71,20 @@ function eze_login_user($uid){
     return false;
 }
 
+/**
+ * 尝试注册用户,如果成功返回True,否则返回False
+ */
 function eze_register_user($profile){
     global $_G;
     loaducenter();
     require_once libfile('function/misc');
     require_once libfile('function/member');
-    include_once (DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php');
+    require_once DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php';
+    $eze_options = $_G['cache']['plugin']['ezengage'];
+
     $lang = $scriptlang['ezengage'];
 
     $username = $profile['preferred_username'];
-
 
     $result = uc_user_checkname($username);
     if($result != 1){
@@ -88,34 +94,14 @@ function eze_register_user($profile){
     $password = md5(mt_rand(7,999999));
     $password = substr($password,5,8); 
 
-    $email = $profile['pid'].'@example.com';
+    //TODO:make the email suffix as an option
+    $email = md5($profile['identity']) . '_' . strval($profile['pid']) . '@' . $eze_options['eze_app_domain'] . '.ezengage.net';
 
     $groupinfo = array();
     if($_G['setting']['regverify']) {
         $groupinfo['groupid'] = 8;
     } else {
         $groupinfo = DB::fetch_first("SELECT groupid FROM ".DB::table('common_usergroup')." WHERE creditshigher<=".intval($_G['setting']['initcredits'])." AND ".intval($_G['setting']['initcredits'])."<creditslower LIMIT 1");
-    }
-
-    //ip控制
-    if($_G['cache']['ipctrl']['ipregctrl']) {
-        foreach(explode("\n", $_G['cache']['ipctrl']['ipregctrl']) as $ctrlip) {
-            if(preg_match("/^(".preg_quote(($ctrlip = trim($ctrlip)), '/').")/", $_G['clientip'])) {
-                $ctrlip = $ctrlip.'%';
-                $_G['setting']['regctrl'] = 72;
-                break;
-            } else {
-                $ctrlip = $_G['clientip'];
-            }
-        }
-    } else {
-        $ctrlip = $_G['clientip'];
-    }
-    if($_G['setting']['regctrl']) {
-        $query = DB::query("SELECT ip FROM ".DB::table('common_regip')." WHERE ip LIKE '$ctrlip' AND count='-1' AND dateline>$_G[timestamp]-'".$_G['setting']['regctrl']."'*3600 LIMIT 1");
-        if(DB::num_rows($query)) {
-            return FALSE;
-        }
     }
 
     //注册到UCenter
@@ -129,19 +115,6 @@ function eze_register_user($profile){
         return FALSE;
     }
 
-    //单IP注册限制
-    if($_G['setting']['regfloodctrl']) {
-        if($regattempts = DB::result_first("SELECT count FROM ".DB::table('common_regip')." WHERE ip='$_G[clientip]' AND count>'0' AND dateline>'$_G[timestamp]'-86400")) {
-            if($regattempts >= $_G['setting']['regfloodctrl']) {
-                return FALSE;
-            } else {
-                DB::query("UPDATE ".DB::table('common_regip')." SET count=count+1 WHERE ip='$_G[clientip]' AND count>'0'");
-            }
-        } else {
-            DB::query("INSERT INTO ".DB::table('common_regip')." (ip, count, dateline)
-                VALUES ('$_G[clientip]', '1', '$_G[timestamp]')");
-        }
-    }
     //插入数据表
     $dzpassword = md5(random(10));
     $init_arr = explode(',', $_G['setting']['initcredits']);
@@ -196,14 +169,6 @@ function eze_register_user($profile){
     //更新缓存
     save_syscache('userstats', $userstats);
     
-    if($_G['setting']['regctrl'] || $_G['setting']['regfloodctrl']) {
-        DB::query("DELETE FROM ".DB::table('common_regip')." WHERE dateline<='$_G[timestamp]'-".($_G['setting']['regctrl'] > 72 ? $_G['setting']['regctrl'] : 72)."*3600", 'UNBUFFERED');
-        if($_G['setting']['regctrl']) {
-            DB::query("INSERT INTO ".DB::table('common_regip')." (ip, count, dateline)
-                VALUES ('$_G[clientip]', '-1', '$_G[timestamp]')");
-        }
-    }
-
     //更新session
     $_G['uid'] = $uid;
     $_G['username'] = $username;
@@ -317,8 +282,6 @@ function eze_bind($profile, $send_pm = FALSE){
             );
             $subject = addslashes(str_replace(array_keys($replaces), array_values($replaces), $lang['new_bind_pm_subject']));
             $message = addslashes(str_replace(array_keys($replaces), array_values($replaces), $lang['new_bind_pm_message']));
-file_put_contents('/tmp/cc1.txt', print_r($lang, True));
-file_put_contents('/tmp/cc.txt', $subject . '\r\n' . $message);
             sendpm($_G['uid'], $subject, $message, 0);
         }
     }
@@ -350,7 +313,7 @@ class eze_publisher {
     static function format_post_status($post){
         global $_G;
         if($post['first']){
-            $url = $_G['siteurl'] . "forum.php?mod=viewthread.php&tid=$post[tid]";
+            $url = $_G['siteurl'] . "forum.php?mod=viewthread&tid=$post[tid]";
         }
         else{
             $url = $_G['siteurl'] . "forum.php?mod=redirect&goto=findpost&pid=$post[pid]&ptid=$post[tid]";
@@ -403,15 +366,53 @@ class eze_publisher {
 
     //同步Share
     static function sync_newshare($sid, $sync_to){
-        $share = DB::fetch_first("SELECT sid,uid,type,title_template,body_general FROM " . DB::table('home_share') . " WHERE sid={$sid}");
+        $share = DB::fetch_first("SELECT * FROM " . DB::table('home_share') . " WHERE sid={$sid}");
         $status = self::format_share_status($share);
-        self::publish($share['uid'], $sync_to, $status);
+        if(!empty($status)){
+            self::publish($share['uid'], $sync_to, $status);
+        }
     }
 
     static function format_share_status($share){
         global $_G;
-        $status = !empty($share['body_general']) ? (string)$share['body_general'] : (string)$share['title_template'];
-        //TODO fix this, check type 
+        $type_map = array(
+            'space' => 'username',
+			'blog' => 'subject',
+			'album' => 'albumname',
+			'pic' => 'albumname',
+			'thread' => 'subject',
+			'article' => 'title',
+			'link' => 'link',
+			'video' => 'link',
+			'music' => 'link',
+			'flash' => 'link',
+		);
+        $t = $type_map[$share['type']];
+        if(empty($t)){
+            return false;
+        }
+
+		$body_data = unserialize($share['body_data']);
+		if('link' != $t){
+            //如果分享的是站内的内容，把链接提取出来
+			$pattern = '/^<a[ ]+href[ ]*=[ ]*"([a-zA-Z0-9\/\\\\@:%_+.~#*?&=\-]+)"[ ]*>(.+)<\/a>$/';
+			preg_match($pattern, $body_data[$t], $match);
+			if(count($match) !== 3){
+				return false;
+			}
+			$link = $_G['siteurl']. $match[1];
+			$title = ('pic' == $t) ? $body_data['title'] : $match[2];
+		}else{
+			$link = $body_data['data'];
+		}
+		
+		$status = !empty($share['body_general']) ? $share['body_general'] : $body_data['title_template'];
+
+		if(!empty($title)){
+            $status .= '  '. strval($title);
+        }
+        $status = $link . ' ' . $status;
+
         $status = eze_convert($status, $_G['charset'], 'UTF-8');
         $status = eze_filter($status);
         $status = substr($status, 0, 1000);
