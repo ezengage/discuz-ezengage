@@ -1,6 +1,7 @@
 <?php
 /*
 	ezEngage (C)2011  http://ezengage.com
+    accept token from ezengage service, and fetch profile data via ezengage api
 */
 
 if(!defined('IN_DISCUZ')) {
@@ -18,11 +19,15 @@ if(empty($eze_app_key)){
 
 $ezeApiClient = new EzEngageApiClient($eze_app_key);
 if(empty($_POST['token'])){
-    exit('Bad Request, missing token.');
+    showmessage('ezengage:bad_request', 'index.php');
+    exit();
 }
-$profile = $ezeApiClient->getProfile($_POST['token']);
+
+//may be do some basic check
+$profile = $ezeApiClient->getProfile(strval($_POST['token']));
 if(!$profile){
-    exit('remote server error');
+    showmessage('ezengage:eze_login_fail', 'index.php');
+    exit();
 }
 
 //convert charset 
@@ -39,7 +44,9 @@ if(!$row){
     $token = md5($_POST['token'] . time());
     $ret = DB::query(sprintf(
         "INSERT INTO " . DB::table('eze_profile') . " (token,uid,identity,provider_code,provider_name,preferred_username,avatar_url,sync_list) VALUES('%s', %d, '%s', '%s', '%s', '%s', '%s', '%s');",
-        $token, 0, mysql_real_escape_string($profile['identity']), mysql_real_escape_string($profile['provider_code']),
+        $token, 0, 
+        mysql_real_escape_string($profile['identity']),
+        mysql_real_escape_string($profile['provider_code']),
         mysql_real_escape_string($profile['provider_name']),
         mysql_real_escape_string($profile['preferred_username']),
         mysql_real_escape_string($profile['avatar_url']),
@@ -49,8 +56,11 @@ if(!$row){
 else{
     $token = $row['token'];    
 }
+
 $token_auth = authcode($token, 'ENCODE');
 dsetcookie('eze_token', $token_auth);
-dheader("Location: plugin.php?id=ezengage:bind");
+
+//这个文件只处理同ezenenge 服务的交互和身份数据的保存，同discuz 系统的集成在下一步完成。
+dheader("location: plugin.php?id=ezengage:bind");
 
 ?>

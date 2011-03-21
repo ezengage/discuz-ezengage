@@ -7,15 +7,11 @@ if(!defined('IN_DISCUZ')) {
 	exit('Access Denied');
 }
 
+//constants
+
 define(EZE_ALL_SYNC_LIST, 'newthread,newblog,newshare,newdoing,reply,blogcomment,sharecomment,dogingcomment');
 define(EZE_DEFAULT_SYNC_LIST, 'newthread,newblog,newshare,newdoing');
-
-//$G_EZE_OPTIONS = $_G['cache']['plugin']['ezengage'];
-//if(!isset($G_EZE_OPTIONS['eze_auto_register'])){
-//    $G_EZE_OPTIONS['eze_auto_register'] = TRUE;
-//}
-
-//utils 
+define(EZE_MY_ACCOUNT_URL, 'home.php?mod=spacecp&ac=plugin&id=ezengage:accounts');
 
 function eze_convert($source, $in, $out){
     $in = strtoupper($in);
@@ -54,23 +50,6 @@ function eze_filter($content) {
     $content = str_replace($re, '', $content);
     $content = preg_replace($_DCACHE['smilies']['searcharray'], '', $content);
     return $content;
-}
-
-function eze_format_status($post){
-    global $_G;
-    if($post['first']){
-        $url = $_G['siteurl'] . "forum.php?mod=viewthread.php&tid=$post[tid]";
-    }
-    else{
-        $url = $_G['siteurl'] . "forum.php?mod=redirect&goto=findpost&pid=$post[pid]&ptid=$post[tid]";
-    }
-    $status = $post['subject'] . ' ' . $post['message'];
-    $status = eze_convert($status, $_G['charset'], 'UTF-8');
-    $status = eze_filter($status);
-    $status = $url . ' ' . $status;
-    #这里的截断只是为了防止大文章时发送过大的数据。
-    $status = substr($status, 0, 1000);
-    return $status;
 }
 
 function eze_sync_checkbox_wrapper($uid, $event, $show = true){
@@ -154,12 +133,12 @@ function eze_sync_list($profile){
     $html = array();
     foreach(explode(',', EZE_ALL_SYNC_LIST) as $sync_item){
         if (strpos($profile['sync_list'], $sync_item) === FALSE){
-            $html[] = "<input name='eze_sync_list_{$profile[profile_id]}[]' type='checkbox' class='checkbox'
-                       value='$syc_item' />";
+            $html[] = "<input name='sync_list_{$profile[pid]}[]' type='checkbox' class='checkbox'
+                       value='$sync_item' />";
         }
         else{
-            $html[] = "<input name='eze_sync_list_{$profile[profile_id]}[]' type='checkbox' class='checkbox'
-                       value='$syc_item' checked='checked' />";
+            $html[] = "<input name='sync_list_{$profile[pid]}[]' type='checkbox' class='checkbox'
+                       value='$sync_item' checked='checked' />";
         }
         $html[] = $scriptlang['ezengage']['sync_name_' . $sync_item];
     }
@@ -170,7 +149,17 @@ function eze_sync_list($profile){
 function eze_sync_list_output($profile){
     print eze_sync_list($profile);
 }
- 
+
+function eze_get_default_sync_to($uid, $event){
+    $event = mysql_real_escape_string($event);
+    $query = DB::query("SELECT pid FROM " . DB::table('eze_profile') . " WHERE uid='$uid' AND Contains(sync_list, '%$event%')");
+    $pids = array();
+    while($profile = DB::fetch($query)) {
+        $pids[] = $profile['pid'];
+    }
+    return $pids;
+}
+
 function eze_get_profiles($uid){
     global $_G;
     $eze_profiles = array();
@@ -195,6 +184,20 @@ function eze_current_profile(){
     return $profile;
 }
 
+function eze_bind($profile, $is_register = FALSE){
+    global $_G;
+    if($_G['uid'] && $profile && !$profile['uid']){
+        $ret = DB::query(sprintf(
+            "UPDATE " . DB::table("eze_profile") . " SET uid = %d WHERE pid = '%s'",
+            $_G['uid'], $profile['pid'])
+        );
+        dsetcookie('eze_token', '');
+        if($is_register){
+            sendpm($_G['uid'], $subject, $message);
+        }
+    }
+}
+
 class eze_publisher {
 
     //同步主题
@@ -214,9 +217,26 @@ class eze_publisher {
             return;
         }
         $uid = $post['authorid'];
-        $status = eze_format_status($post);
+        $status = self::format_post_status($post);
         self::publish($uid, $sync_to, $status);
     } 
+
+    static function format_post_status($post){
+        global $_G;
+        if($post['first']){
+            $url = $_G['siteurl'] . "forum.php?mod=viewthread.php&tid=$post[tid]";
+        }
+        else{
+            $url = $_G['siteurl'] . "forum.php?mod=redirect&goto=findpost&pid=$post[pid]&ptid=$post[tid]";
+        }
+        $status = $post['subject'] . ' ' . $post['message'];
+        $status = eze_convert($status, $_G['charset'], 'UTF-8');
+        $status = eze_filter($status);
+        $status = $url . ' ' . $status;
+        #这里的截断只是为了防止大文章时发送过大的数据。
+        $status = substr($status, 0, 1000);
+        return $status;
+    }
 
     //同步记录
     static function sync_newdoing($doid, $sync_to){

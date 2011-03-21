@@ -14,7 +14,7 @@
             <item id="datatables"><![CDATA[eze_profile]]></item>
             <item id="directory"><![CDATA[ezengage/]]></item>
             <item id="copyright"><![CDATA[ezEngage Team]]></item>
-            <item id="version"><![CDATA[0.1]]></item>
+            <item id="version"><![CDATA[0.2.5.2]]></item>
             <item id="__modules">
                 <item id="0">
                     <item id="name"><![CDATA[common]]></item>
@@ -107,7 +107,7 @@
                 <item id="description"><![CDATA[]]></item>
                 <item id="variable"><![CDATA[eze_app_domain]]></item>
                 <item id="type"><![CDATA[text]]></item>
-                <item id="value"><![CDATA[ezengage]]></item>
+                <item id="value"><![CDATA[]]></item>
                 <item id="extra"><![CDATA[]]></item>
             </item>
             <item id="2">
@@ -116,7 +116,7 @@
                 <item id="description"><![CDATA[]]></item>
                 <item id="variable"><![CDATA[eze_app_id]]></item>
                 <item id="type"><![CDATA[text]]></item>
-                <item id="value"><![CDATA[12345]]></item>
+                <item id="value"><![CDATA[]]></item>
                 <item id="extra"><![CDATA[]]></item>
             </item>
             <item id="3">
@@ -125,19 +125,22 @@
                 <item id="description"><![CDATA[]]></item>
                 <item id="variable"><![CDATA[eze_app_key]]></item>
                 <item id="type"><![CDATA[text]]></item>
-                <item id="value"><![CDATA[b94548476f247a7e8838b1dd1bee7273]]></item>
+                <item id="value"><![CDATA[]]></item>
                 <item id="extra"><![CDATA[]]></item>
             </item>
         </item>
         <item id="language">
             <item id="scriptlang">
-                <item id="bind_success"><![CDATA[帐号连接成功]]></item>
-                <item id="login_link_label"><![CDATA[通过第三方帐号登录]]></item>
-                <item id="login_link_label_long"><![CDATA[你也可以使用新浪微博，腾讯微博等帐号登录]]></item>
+                <item id="footer_link_text"><![CDATA[ezEngage]]></item>
+                <item id="footer_link_title"><![CDATA[社会化登录技术由ezEngage提供]]></item>
+                <item id="bind_success"><![CDATA[帐号绑定成功]]></item>
                 <item id="updateuser_succeed"><![CDATA[修改成功]]></item>
                 <item id="sync_checkbox_label"><![CDATA[同步到%s的%s]]></item>
                 <item id="already_bind_to_other_user"><![CDATA[该帐号已经绑定到别的用户了]]></item>
                 <item id="bad_request"><![CDATA[错误的请求，请返回检查你的来路]]></item>
+                <item id="login_fail"><![CDATA[登录失败，请检查你的输入或重试一次]]></item>
+                <item id="new_bind_pm_subject"><![CDATA[您已成功绑定{provider_name}帐号{preferred_username}]]></item>
+                <item id="new_bind_pm_message"><![CDATA[您已成功绑定{provider_name}帐号{preferred_username}],你可以访问[url={siteurl}home.php?mod=spacecp&ac=plugin&id=ezengage:accounts]我绑定的帐号[/url]管理你的帐号和调整希望同步的内容。]]></item>
                 <item id="sync_name_newthread"><![CDATA[帖子]]></item>
                 <item id="sync_name_newblog"><![CDATA[日志]]></item>
                 <item id="sync_name_newshare"><![CDATA[分享]]></item>
@@ -148,7 +151,6 @@
                 <item id="sync_name_dogingcomment"><![CDATA[记录评论]]></item>
             </item>
             <item id="templatelang">
-                <item id="provider_tencentweibo"><![CDATA[腾讯微博]]></item>
                 <item id="myaccounts"><![CDATA[我绑定的帐号]]></item>
                 <item id="provider"><![CDATA[网络]]></item>
                 <item id="provider_username"><![CDATA[用户]]></item>

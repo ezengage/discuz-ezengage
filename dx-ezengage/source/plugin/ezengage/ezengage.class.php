@@ -14,31 +14,18 @@ class plugin_ezengage {
     }
 
     function __construct() { 
+        global $_G;
         include(DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php');
         $this->slang = $scriptlang['ezengage'];
         $this->tlang = $templatelang['ezengage'];
         $this->profile = eze_current_profile();
+        $this->options = $_G['cache']['plugin']['ezengage'];
     }
 
     function global_footer(){
         global $_G;
-        if($_G['uid'] > 0){
-            $this->_try_bind();
-            return '';
-        }
-        else{
+        if(!$_G['uid']){
             return $this->_top_login_widget();
-        }
-    }
-
-    function _try_bind(){
-        global $_G;
-        if($this->profile){
-            $ret = DB::query(sprintf(
-                "UPDATE " . DB::table("eze_profile") . " SET uid = %d WHERE pid = '%s'",
-                $_G['uid'], $this->profile['pid'])
-            );
-            dsetcookie('eze_token', '');
         }
     }
 
@@ -61,36 +48,17 @@ class plugin_ezengage {
         return $html . $script;
     }
 
-/*
  	function global_footerlink() {
-        global $G_EZE_OPTIONS;
-        if($G_EZE_OPTIONS['eze_disable_auto_modify_template']){
-            return '';
-        }
-		global $db, $tablepre, $discuz_uid, $discuz_user, $scriptlang;
-        return '<span class="pipe">|</span><a href="http://ezengage.com/?utm_source=party&utm_medium-friendlnk&utm_term=">ezEngage</a>';
+        return sprintf(
+            '<span class="pipe">|</span><a href="http://ezengage.com/?utm_source=%s&utm_medium=powerby-footerlink" title="%s">%s</a>', 
+            $this->options['eze_app_domain'],
+            $this->slang['footer_link_title'],
+            $this->slang['footer_link_text']
+        );
     }
-*/
 }
 	
 class plugin_ezengage_forum extends plugin_ezengage {
-
-    var $insert_sync_checkbox_script = "
-        <script type='text/javascript'>
-        try{
-            function _add_eze_checkbox_wrapper(){
-                var _target = document.getElementById('fastpostsubmit').parentNode;
-                _eze_div = document.getElementById('eze_sync_checkbox_wrapper')
-                _eze_div.parentNode.removeChild(_eze_div)
-                _target.parentNode.insertBefore(_eze_div, _target); 
-                display('eze_sync_checkbox_wrapper');
-            }
-            _attachEvent(window, 'load', _add_eze_checkbox_wrapper, null);
-        }
-        catch(e){
-        }
-        </script>
-    ";
 
     function plugin_ezengage_forum() { 
         $this->__construct();
@@ -100,35 +68,19 @@ class plugin_ezengage_forum extends plugin_ezengage {
         parent::__construct(); 
     } 
 
-    function post_middle(){
-        global $_G;
-        if($_G['uid']){
-            return eze_sync_checkbox_wrapper($_G['uid'], $_G['gp_action']);
-        }
-    }
-
-    function forumdisplay_fastpost_content(){
-        global $_G;
-        if(!$_G['uid']){
-            return '';
-        }
-        $html = eze_sync_checkbox_wrapper($_G['uid'], 'newthread', false);
-        return $html . $this->insert_sync_checkbox_script;
-    }
-
-    function viewthread_fastpost_content(){
-        global $_G;
-        if(!$_G['uid']){
-            return '';
-        }
-        $html = eze_sync_checkbox_wrapper($_G['uid'], 'reply', false);
-        return $html . $this->insert_sync_checkbox_script;
-    }
-
     function post_register_shutdown(){
         global $_G;
-        if(count($_G['gp_eze_should_sync']) > 0){
-            register_shutdown_function(array('plugin_ezengage_forum', '_sync_post'));
+        //only in post
+        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            if($_G['gp_action'] == 'newthread' || $_G['gp_action'] == 'reply'){
+                if(!isset($_G['gp_eze_sync_event'])){
+                    $_G['gp_eze_sync_event'] = $_G['gp_action'];
+                    $_G['gp_eze_should_sync'] = eze_get_default_sync_to($_G['uid'], $_G['gp_eze_sync_event']);
+                }
+                if(count($_G['gp_eze_should_sync']) > 0){
+                    register_shutdown_function(array('plugin_ezengage_forum', '_sync_post'));
+                }
+            }
         }
     }
 
@@ -157,90 +109,28 @@ class plugin_ezengage_home extends plugin_ezengage{
         parent::__construct(); 
     } 
 
-    function spacecp_bottom(){
-        global $_G;
-        if(!$_G['uid']){
-            return '';
-        }
-        if($_G['gp_ac'] == 'blog'){
-            $html = eze_sync_checkbox_wrapper($_G['uid'], 'newblog', false);
-            $script = "
-            <script type='text/javascript'>
-            try{
-                function _add_eze_checkbox_wrapper(){
-                    var _target = document.getElementById('ttHtmlEditor')
-                    _eze_div = document.getElementById('eze_sync_checkbox_wrapper')
-                    _eze_div.parentNode.removeChild(_eze_div)
-                    _target.appendChild(_eze_div); 
-                    display('eze_sync_checkbox_wrapper');
-                }
-                _add_eze_checkbox_wrapper();
-            }
-            catch(e){
-            }
-            </script>
-            ";
-            return $html . $script;
-        }
-    }
-
-    function space_share_bottom(){
-        global $_G;
-        if(!$_G['uid']){
-            return '';
-        }
-        $html = eze_sync_checkbox_wrapper($_G['uid'], 'newshare', false);
-        $script = "
-        <script type='text/javascript'>
-        try{
-            function _add_eze_checkbox_wrapper(){
-                var _target = document.getElementById('shareform')
-                _eze_div = document.getElementById('eze_sync_checkbox_wrapper')
-                _eze_div.parentNode.removeChild(_eze_div)
-                _target.appendChild(_eze_div); 
-                display('eze_sync_checkbox_wrapper');
-            }
-            _add_eze_checkbox_wrapper();
-        }
-        catch(e){
-        }
-        </script>
-        ";
-        return $html . $script;
-    }
-
-    function space_doing_bottom(){
-        global $_G;
-        if(!$_G['uid']){
-            return '';
-        }
-        $html = eze_sync_checkbox_wrapper($_G['uid'], 'newdoing', false);
-        $script = "
-        <script type='text/javascript'>
-        try{
-            function _add_eze_checkbox_wrapper(){
-                var _target = document.getElementById('mood_addform')
-                _eze_div = document.getElementById('eze_sync_checkbox_wrapper')
-                _eze_div.parentNode.removeChild(_eze_div)
-                _target.appendChild(_eze_div); 
-                display('eze_sync_checkbox_wrapper');
-            }
-            _add_eze_checkbox_wrapper();
-            //_attachEvent(window, 'load', _add_eze_checkbox_wrapper, null);
-        }
-        catch(e){
-        }
-        </script>
-        ";
-        return $html . $script;
-    }
-
     function spacecp_register_shutdown(){
         global $_G;
-        if(count($_G['gp_eze_should_sync']) > 0){
-            $func = array('plugin_ezengage_home', '_sync_' . strval($_G['gp_eze_sync_event']));
-            if(is_callable($func)){
-                register_shutdown_function($func);
+        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            switch($_G['gp_ac']){
+                case 'share':
+                    $_G['gp_eze_sync_event'] = 'newshare';
+                    break;
+                case 'blog':
+                    $_G['gp_eze_sync_event'] = 'newblog';
+                    break;
+                case 'doing':
+                    $_G['gp_eze_sync_event'] = 'newdoing';
+                    break;
+            }
+            if(isset($_G['gp_eze_sync_event'])){
+                $_G['gp_eze_should_sync'] = eze_get_default_sync_to($_G['uid'], $_G['gp_eze_sync_event']);
+                if(count($_G['gp_eze_should_sync']) > 0){
+                    $func = array('plugin_ezengage_home', '_sync_' . $_G['gp_eze_sync_event']);
+                    if(is_callable($func)){
+                        register_shutdown_function($func);
+                    }
+                }
             }
         }
     }
@@ -250,7 +140,7 @@ class plugin_ezengage_home extends plugin_ezengage{
         $arr = isset($GLOBALS['arr']) ? (array)$GLOBALS['arr'] : array();
         $sid = isset($GLOBALS['sid']) ? (int)$GLOBALS['sid'] : 0; 
         if($sid >= 1){
-            eze_publisher::sync_newshare($sid, $arr, $_G['gp_eze_should_sync']);
+            eze_publisher::sync_newshare($sid, $_G['gp_eze_should_sync']);
         }
     }
 
@@ -286,9 +176,6 @@ class plugin_ezengage_member extends plugin_ezengage{
 		if(!$_G['uid']){
             return eze_login_widget('medium');
 		}
-        else{
-            return '';
-        }
 	}
 	
 	function register_side() {
@@ -312,9 +199,6 @@ class plugin_ezengage_member extends plugin_ezengage{
                 return eze_login_widget('medium', 250, 125);
             }
 		}
-        else{
-            return '';
-        }
 	}
 
     function register_top(){
@@ -330,8 +214,41 @@ class plugin_ezengage_member extends plugin_ezengage{
                 return $html;
             }
         }
-        
     }
+
+    function register_bind(){
+        if($this->profile){
+            register_shutdown_function(array('plugin_ezengage_member', '_bind'), $this->profile, $this->slang, TRUE);
+        }
+    }
+
+    function logging_bind(){
+        if($this->profile){
+            register_shutdown_function(array('plugin_ezengage_member', '_bind'), $this->profile, $this->slang, FALSE);
+        }
+    }
+
+    static function _bind($profile, $lang, $is_register = FALSE){
+        global $_G;
+        if($_G['uid'] && $profile && !$profile['uid']){
+            $ret = DB::query(sprintf(
+                "UPDATE " . DB::table("eze_profile") . " SET uid = %d WHERE pid = '%s'",
+                $_G['uid'], $profile['pid']
+            ));
+            dsetcookie('eze_token', '');
+            if($is_register){
+                $replaces = array(
+                    '{siteurl}' => $_G['siteurl'],
+                    '{provider_name}' => $profile['provider_name'],
+                    '{preferred_username}' => $profile['preferred_username'],
+                );
+                $subject = addslashes(str_replace(array_keys($replaces), array_values($replaces), $lang['new_bind_pm_subject']));
+                $message = addslashes(str_replace(array_keys($replaces), array_values($replaces), $lang['new_bind_pm_message']));
+                sendpm($_G['uid'], $subject, $message, 0);
+            }
+        }
+    }
+
 }
 
 
