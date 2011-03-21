@@ -1,5 +1,4 @@
 <?php
-//error_reporting(E_ALL);
 if(!defined('IN_DISCUZ')) {
     exit('Access Denied');
 }
@@ -254,37 +253,15 @@ class plugin_ezengage_member extends plugin_ezengage{
 
     function register_bind(){
         if($this->profile){
-            register_shutdown_function(array('plugin_ezengage_member', '_bind'), $this->profile, $this->slang, TRUE);
+            register_shutdown_function('eze_bind', $this->profile, TRUE);
         }
     }
 
     function logging_bind(){
         if($this->profile){
-            register_shutdown_function(array('plugin_ezengage_member', '_bind'), $this->profile, $this->slang, FALSE);
+            register_shutdown_function('eze_bind', $this->profile, False);
         }
     }
-
-    static function _bind($profile, $lang, $is_register = FALSE){
-        global $_G;
-        if($_G['uid'] && $profile && !$profile['uid']){
-            $ret = DB::query(sprintf(
-                "UPDATE " . DB::table("eze_profile") . " SET uid = %d WHERE pid = '%s'",
-                $_G['uid'], $profile['pid']
-            ));
-            dsetcookie('eze_token', '');
-            if($is_register){
-                $replaces = array(
-                    '{siteurl}' => $_G['siteurl'],
-                    '{provider_name}' => $profile['provider_name'],
-                    '{preferred_username}' => $profile['preferred_username'],
-                );
-                $subject = addslashes(str_replace(array_keys($replaces), array_values($replaces), $lang['new_bind_pm_subject']));
-                $message = addslashes(str_replace(array_keys($replaces), array_values($replaces), $lang['new_bind_pm_message']));
-                sendpm($_G['uid'], $subject, $message, 0);
-            }
-        }
-    }
-
 }
 
 

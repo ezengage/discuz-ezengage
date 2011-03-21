@@ -33,7 +33,7 @@ function eze_convert($source, $in, $out){
 }   
 
 function eze_filter($content) {
-    global $_DCACHE;
+    global $_G;
     //attach 
     $content = preg_replace('!\[(attachimg|attach)\]([^\[]+)\[/(attachimg|attach)\]!', '', $content);
     //image
@@ -44,44 +44,11 @@ function eze_filter($content) {
         $content = preg_replace($re, '\2', $content);
     }
     //smiles
-    $re = $_DCACHE['smileycodes'];
-    //FIXME 
-    $_DCACHE['smilies']['searcharray'] = isset($_DCACHE['smilies']['searcharray']) ? $_DCACHE['smilies']['searcharray'] : array();
+    $re = isset($_G['cache']['smileycodes']) ? (array)$_G['cache']['smileycodes'] : array();
+    $smiles_searcharray = isset($_G['cache']['smilies']['searcharray']) ? (array)$_G['cache']['smilies']['searcharray'] : array();
     $content = str_replace($re, '', $content);
-    $content = preg_replace($_DCACHE['smilies']['searcharray'], '', $content);
+    $content = preg_replace($smiles_searcharray, '', $content);
     return $content;
-}
-
-function eze_sync_checkbox_wrapper($uid, $event, $show = true){
-    global $_G;
-    include(DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php');
-
-    $eze_profiles = array();
-    $query = DB::query("SELECT * FROM " . DB::table('eze_profile') . " WHERE uid=$uid;");
-    while($profile = DB::fetch($query)) {
-        $eze_profiles[] = $profile;
-    }
-    $html = array(
-        '<div id="eze_sync_checkbox_wrapper" style="margin-bottom:5px;' . ($show ? '':'display:none') . '">',
-    );
-    foreach($eze_profiles as $profile){
-        if(strpos($profile['sync_list'], $event) === FALSE){
-            $html[] = "<input name='eze_should_sync[]' type='checkbox' class='checkbox' value='$profile[pid]' />";
-        }
-        else{
-            $html[] = "<input name='eze_should_sync[]' type='checkbox' class='checkbox' checked='checked' value='$profile[pid]' />";
-        }
-        $html[] =  sprintf($scriptlang['ezengage']['sync_checkbox_label'], $profile['provider_name'], $profile['preferred_username']);
-    }
-    $html[] = "<input type='hidden' name='eze_include_sync_options' value='1'/>";
-    $html[] = "<input type='hidden' name='eze_sync_event' value='$event'/>";
-    $html[] = "</div>";
-    $html = implode('', $html);
-    return $html;
-}
-
-function eze_sync_checkbox_output($uid){
-    echo eze_sync_checkbox_wrapper($uid, true);
 }
 
 function eze_login_user($uid){
@@ -92,20 +59,167 @@ function eze_login_user($uid){
     if(is_array($member) && $member['username']){
         setloginstatus($member, $_G['gp_cookietime'] ? 2592000 : 0);
         DB::query("UPDATE ".DB::table('common_member_status')." SET lastip='".$_G['clientip']."', lastvisit='".time()."' WHERE uid='$_G[uid]'");
-        $ucsynlogin = $_G['setting']['allowsynlogin'] ? uc_user_synlogin($_G['uid']) : '';
 
         include_once DISCUZ_ROOT . './source/function/function_stat.php';
         updatestat('login');
         updatecreditbyaction('daylogin', $_G['uid']);
         checkusergroup($_G['uid']);
-
-        dsetcookie('eze_token', '');
-
-        $_G['gp_refer'] = $_G['gp_refer'] ? $_G['gp_refer'] : 'forum.php';
-        showmessage('login_success', $_G['gp_refer'], array('username' => $memeber['username']));
         return true;
     } 
     return false;
+}
+
+function eze_register_user($profile){
+    global $_G;
+    loaducenter();
+    require_once libfile('function/misc');
+    require_once libfile('function/member');
+    include_once (DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php');
+    $lang = $scriptlang['ezengage'];
+
+    $username = $profile['preferred_username'];
+
+
+    $result = uc_user_checkname($username);
+    if($result != 1){
+        return FALSE;
+    }
+
+    $password = md5(mt_rand(7,999999));
+    $password = substr($password,5,8); 
+
+    $email = $profile['pid'].'@example.com';
+
+    $groupinfo = array();
+    if($_G['setting']['regverify']) {
+        $groupinfo['groupid'] = 8;
+    } else {
+        $groupinfo = DB::fetch_first("SELECT groupid FROM ".DB::table('common_usergroup')." WHERE creditshigher<=".intval($_G['setting']['initcredits'])." AND ".intval($_G['setting']['initcredits'])."<creditslower LIMIT 1");
+    }
+
+    //ip控制
+    if($_G['cache']['ipctrl']['ipregctrl']) {
+        foreach(explode("\n", $_G['cache']['ipctrl']['ipregctrl']) as $ctrlip) {
+            if(preg_match("/^(".preg_quote(($ctrlip = trim($ctrlip)), '/').")/", $_G['clientip'])) {
+                $ctrlip = $ctrlip.'%';
+                $_G['setting']['regctrl'] = 72;
+                break;
+            } else {
+                $ctrlip = $_G['clientip'];
+            }
+        }
+    } else {
+        $ctrlip = $_G['clientip'];
+    }
+    if($_G['setting']['regctrl']) {
+        $query = DB::query("SELECT ip FROM ".DB::table('common_regip')." WHERE ip LIKE '$ctrlip' AND count='-1' AND dateline>$_G[timestamp]-'".$_G['setting']['regctrl']."'*3600 LIMIT 1");
+        if(DB::num_rows($query)) {
+            return FALSE;
+        }
+    }
+
+    //注册到UCenter
+    $uid = uc_user_register($username, $password, $email, '', '', $_G['clientip']);
+    if($uid <= 0) {
+        return FALSE;
+    }
+
+    //检测uid重复
+    if(DB::result_first("SELECT uid FROM ".DB::table('common_member')." WHERE uid='$uid'")) {
+        return FALSE;
+    }
+
+    //单IP注册限制
+    if($_G['setting']['regfloodctrl']) {
+        if($regattempts = DB::result_first("SELECT count FROM ".DB::table('common_regip')." WHERE ip='$_G[clientip]' AND count>'0' AND dateline>'$_G[timestamp]'-86400")) {
+            if($regattempts >= $_G['setting']['regfloodctrl']) {
+                return FALSE;
+            } else {
+                DB::query("UPDATE ".DB::table('common_regip')." SET count=count+1 WHERE ip='$_G[clientip]' AND count>'0'");
+            }
+        } else {
+            DB::query("INSERT INTO ".DB::table('common_regip')." (ip, count, dateline)
+                VALUES ('$_G[clientip]', '1', '$_G[timestamp]')");
+        }
+    }
+    //插入数据表
+    $dzpassword = md5(random(10));
+    $init_arr = explode(',', $_G['setting']['initcredits']);
+    $userdata = array(
+        'uid' => $uid,
+        'username' => $username,
+        'password' => $dzpassword,
+        'email' => $email,
+        'adminid' => 0,
+        'groupid' => $groupinfo[groupid],
+        'regdate' => TIMESTAMP,
+        'credits' => $init_arr[0],
+        'timeoffset' => 9999
+    );
+    DB::insert('common_member', $userdata);
+    $pm_subject = replacesitevar($lang['auto_register_pm_subject']);
+    $pm_message = replacesitevar($lang['auto_register_pm_message']);
+    $pm_message = str_replace(array('{password}'), array($password), $pm_message);
+
+    $pm_subject = addslashes($pm_subject);
+    $pm_message = addslashes($pm_message);
+    sendpm($uid, $pm_subject, $pm_message, 0);
+
+    $status_data = array(
+        'uid' => $uid,
+        'regip' => $_G['clientip'],
+        'lastip' => $_G['clientip'],
+        'lastvisit' => TIMESTAMP,
+        'lastactivity' => TIMESTAMP,
+        'lastpost' => 0,
+        'lastsendmail' => 0,
+    );
+    DB::insert('common_member_status', $status_data);
+
+    //初始化积分
+    $count_data = array(
+        'uid' => $uid,
+        'extcredits1' => $init_arr[1],
+        'extcredits2' => $init_arr[2],
+        'extcredits3' => $init_arr[3],
+        'extcredits4' => $init_arr[4],
+        'extcredits5' => $init_arr[5],
+        'extcredits6' => $init_arr[6],
+        'extcredits7' => $init_arr[7],
+        'extcredits8' => $init_arr[8]
+    );
+    DB::insert('common_member_count', $count_data);
+    manyoulog('user', $uid, 'add');
+    //更新最新注册
+    $totalmembers = DB::result_first("SELECT COUNT(*) FROM ".DB::table('common_member'));
+    $userstats = array('totalmembers' => $totalmembers, 'newsetuser' => $username);
+    //更新缓存
+    save_syscache('userstats', $userstats);
+    
+    if($_G['setting']['regctrl'] || $_G['setting']['regfloodctrl']) {
+        DB::query("DELETE FROM ".DB::table('common_regip')." WHERE dateline<='$_G[timestamp]'-".($_G['setting']['regctrl'] > 72 ? $_G['setting']['regctrl'] : 72)."*3600", 'UNBUFFERED');
+        if($_G['setting']['regctrl']) {
+            DB::query("INSERT INTO ".DB::table('common_regip')." (ip, count, dateline)
+                VALUES ('$_G[clientip]', '-1', '$_G[timestamp]')");
+        }
+    }
+
+    //更新session
+    $_G['uid'] = $uid;
+    $_G['username'] = $username;
+    $_G['member']['username'] = dstripslashes($_G['username']);
+    $_G['member']['password'] = $dzpassword;
+    $_G['groupid'] = $groupinfo['groupid'];
+    include_once libfile('function/stat');
+    updatestat('register');
+    
+    $_CORE = & discuz_core::instance();
+    $_CORE->session->set('uid', $uid);
+    $_CORE->session->set('username', $username);
+    //创建cookie
+    dsetcookie('auth', authcode("{$_G['member']['password']}\t$_G[uid]", 'ENCODE'), 2592000, 1, true);
+
+    return True;
 }
 
 function eze_login_widget($style = 'normal', $width = 'auto', $height = 'auto'){
@@ -184,16 +298,28 @@ function eze_current_profile(){
     return $profile;
 }
 
-function eze_bind($profile, $is_register = FALSE){
+function eze_bind($profile, $send_pm = FALSE){
     global $_G;
+    include(DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php');
+    $lang = $scriptlang['ezengage'];
+
     if($_G['uid'] && $profile && !$profile['uid']){
         $ret = DB::query(sprintf(
             "UPDATE " . DB::table("eze_profile") . " SET uid = %d WHERE pid = '%s'",
-            $_G['uid'], $profile['pid'])
-        );
+            $_G['uid'], $profile['pid']
+        ));
         dsetcookie('eze_token', '');
-        if($is_register){
-            sendpm($_G['uid'], $subject, $message);
+        if($send_pm){
+            $replaces = array(
+                '{siteurl}' => $_G['siteurl'],
+                '{provider_name}' => $profile['provider_name'],
+                '{preferred_username}' => $profile['preferred_username'],
+            );
+            $subject = addslashes(str_replace(array_keys($replaces), array_values($replaces), $lang['new_bind_pm_subject']));
+            $message = addslashes(str_replace(array_keys($replaces), array_values($replaces), $lang['new_bind_pm_message']));
+file_put_contents('/tmp/cc1.txt', print_r($lang, True));
+file_put_contents('/tmp/cc.txt', $subject . '\r\n' . $message);
+            sendpm($_G['uid'], $subject, $message, 0);
         }
     }
 }

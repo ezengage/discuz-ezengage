@@ -42,16 +42,17 @@ $row = DB::fetch_first("SELECT token,uid,identity FROM " . DB::table('eze_profil
 //new user
 if(!$row){
     $token = md5($_POST['token'] . time());
-    $ret = DB::query(sprintf(
-        "INSERT INTO " . DB::table('eze_profile') . " (token,uid,identity,provider_code,provider_name,preferred_username,avatar_url,sync_list) VALUES('%s', %d, '%s', '%s', '%s', '%s', '%s', '%s');",
-        $token, 0, 
-        mysql_real_escape_string($profile['identity']),
-        mysql_real_escape_string($profile['provider_code']),
-        mysql_real_escape_string($profile['provider_name']),
-        mysql_real_escape_string($profile['preferred_username']),
-        mysql_real_escape_string($profile['avatar_url']),
-        EZE_DEFAULT_SYNC_LIST
-    ));
+    $data = array(
+        'token' => $token,
+        'uid' => 0,
+        'identity' => $profile['identity'],
+        'provider_code' => $profile['provider_code'],
+        'provider_name' => $profile['provider_name'],
+        'preferred_username' => $profile['preferred_username'],
+        'avatar_url' => $profile['avatar_url'],
+        'sync_list' => EZE_DEFAULT_SYNC_LIST,
+    );
+    $newid = DB::insert('eze_profile', $data);
 }
 else{
     $token = $row['token'];    

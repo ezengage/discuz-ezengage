@@ -31,8 +31,16 @@ else{
             showmessage('ezengage:already_bind_to_other_user', EZE_MY_ACCOUNT_URL);
         }
         else {
-            if(!eze_login_user($profile['uid'])){
-                showmessage('ezengage:login_fail', 'memeber.php?mod=login');
+            if(eze_login_user($profile['uid'])){
+                dsetcookie('eze_token', '');
+                $ucsynlogin = $_G['setting']['allowsynlogin'] ? uc_user_synlogin($_G['uid']) : '';
+                $_G['gp_refer'] = $_G['gp_refer'] ? $_G['gp_refer'] : 'index.php';
+                showmessage('login_succeed', $_G['gp_refer'], 
+                    array('username' => $_G['member']['username'], 'ucsynlogin' => $ucsynlogin, 'uid' => $_G['uid'])
+                );
+            }
+            else{
+                showmessage('ezengage:login_fail', 'member.php?mod=logging&action=login');
             }
         } 
     }
@@ -48,7 +56,20 @@ else{
         }
         //否则显示将界面要求登录或注册
         else{
-            dheader("location: member.php?mod=register&referer=" .urlencode("home.php?mod=spacecp&ac=plugin&id=ezengage:accounts"));
+
+            if($_G['cache']['plugin']['ezengage']['eze_enable_auto_register'] \
+                && eze_register_user($profile)){
+                if($_G['uid']){
+                    eze_bind($profile, TRUE);
+                }
+                $_G['gp_refer'] = $_G['gp_refer'] ? $_G['gp_refer'] : 'index.php';
+                showmessage('login_succeed', $_G['gp_refer'], 
+                    array('username' => $_G['member']['username'],'uid' => $_G['uid'])
+                );
+            }
+            else{
+                dheader("location: member.php?mod=register&referer=" .urlencode(EZE_MY_ACCOUNT_URL));
+            }
         }
     }
 }

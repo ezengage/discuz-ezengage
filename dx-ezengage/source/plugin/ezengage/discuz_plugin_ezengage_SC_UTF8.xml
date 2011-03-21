@@ -14,7 +14,7 @@
             <item id="datatables"><![CDATA[eze_profile]]></item>
             <item id="directory"><![CDATA[ezengage/]]></item>
             <item id="copyright"><![CDATA[ezEngage Team]]></item>
-            <item id="version"><![CDATA[0.2.5.3]]></item>
+            <item id="version"><![CDATA[0.2.5.7]]></item>
             <item id="__modules">
                 <item id="0">
                     <item id="name"><![CDATA[common]]></item>
@@ -92,16 +92,7 @@
         </item>
         <item id="version"><![CDATA[X1.5]]></item>
         <item id="var">
-            <item id="0">
-                <item id="displayorder"><![CDATA[3]]></item>
-                <item id="title"><![CDATA[禁用自动修改模版]]></item>
-                <item id="description"><![CDATA[]]></item>
-                <item id="variable"><![CDATA[eze_disable_auto_modify_template]]></item>
-                <item id="type"><![CDATA[radio]]></item>
-                <item id="value"><![CDATA[0]]></item>
-                <item id="extra"><![CDATA[]]></item>
-            </item>
-            <item id="1">
+           <item id="0">
                 <item id="displayorder"><![CDATA[0]]></item>
                 <item id="title"><![CDATA[ezEngage App Domain]]></item>
                 <item id="description"><![CDATA[]]></item>
@@ -110,7 +101,7 @@
                 <item id="value"><![CDATA[]]></item>
                 <item id="extra"><![CDATA[]]></item>
             </item>
-            <item id="2">
+            <item id="1">
                 <item id="displayorder"><![CDATA[1]]></item>
                 <item id="title"><![CDATA[ezEngage App ID]]></item>
                 <item id="description"><![CDATA[]]></item>
@@ -119,7 +110,7 @@
                 <item id="value"><![CDATA[]]></item>
                 <item id="extra"><![CDATA[]]></item>
             </item>
-            <item id="3">
+            <item id="2">
                 <item id="displayorder"><![CDATA[2]]></item>
                 <item id="title"><![CDATA[ezEngage App Key]]></item>
                 <item id="description"><![CDATA[]]></item>
@@ -128,6 +119,16 @@
                 <item id="value"><![CDATA[]]></item>
                 <item id="extra"><![CDATA[]]></item>
             </item>
+            <item id="3">
+                <item id="displayorder"><![CDATA[3]]></item>
+                <item id="title"><![CDATA[允许自动注册]]></item>
+                <item id="description"><![CDATA[]]></item>
+                <item id="variable"><![CDATA[eze_enable_auto_register]]></item>
+                <item id="type"><![CDATA[radio]]></item>
+                <item id="value"><![CDATA[0]]></item>
+                <item id="extra"><![CDATA[]]></item>
+            </item>
+ 
         </item>
         <item id="language">
             <item id="scriptlang">
@@ -140,7 +141,7 @@
                 <item id="bad_request"><![CDATA[错误的请求，请返回检查你的来路]]></item>
                 <item id="login_fail"><![CDATA[登录失败，请检查你的输入或重试一次]]></item>
                 <item id="new_bind_pm_subject"><![CDATA[您已成功绑定{provider_name}帐号{preferred_username}]]></item>
-                <item id="new_bind_pm_message"><![CDATA[您已成功绑定{provider_name}帐号{preferred_username}],你可以访问[url={siteurl}home.php?mod=spacecp&ac=plugin&id=ezengage:accounts]我绑定的帐号[/url]管理你的帐号和调整希望同步的内容。]]></item>
+                <item id="new_bind_pm_message"><![CDATA[您已成功绑定{provider_name}帐号{preferred_username},你可以访问[url={siteurl}home.php?mod=spacecp&ac=plugin&id=ezengage:accounts]我绑定的帐号[/url]管理你的帐号和调整希望同步的内容。]]></item>
                 <item id="sync_name_newthread"><![CDATA[帖子]]></item>
                 <item id="sync_name_newblog"><![CDATA[日志]]></item>
                 <item id="sync_name_newshare"><![CDATA[分享]]></item>
@@ -149,6 +150,13 @@
                 <item id="sync_name_blogcomment"><![CDATA[日志评论]]></item>
                 <item id="sync_name_sharecomment"><![CDATA[分享评论]]></item>
                 <item id="sync_name_doingcomment"><![CDATA[记录评论]]></item>
+                <item id="auto_register_pm_subject"><![CDATA[{username}，您好，感谢您的注册，请阅读以下内容。]]></item>
+                <item id="auto_register_pm_message"><![CDATA[尊敬的{username}，您已经注册成为{sitename}的会员，您的密码为{password}。请您在发表言论时，遵守当地法律法规。
+如果您有什么疑问可以联系管理员，Email: {adminemail}。
+
+
+{bbname}
+{time}]]></item>
             </item>
             <item id="templatelang">
                 <item id="myaccounts"><![CDATA[我绑定的帐号]]></item>
