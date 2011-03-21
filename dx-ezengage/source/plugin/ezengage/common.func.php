@@ -9,7 +9,7 @@ if(!defined('IN_DISCUZ')) {
 
 //constants
 
-define(EZE_ALL_SYNC_LIST, 'newthread,newblog,newshare,newdoing,reply,blogcomment,sharecomment,dogingcomment');
+define(EZE_ALL_SYNC_LIST, 'newthread,newblog,newshare,newdoing,reply,blogcomment,sharecomment,doingcomment');
 define(EZE_DEFAULT_SYNC_LIST, 'newthread,newblog,newshare,newdoing');
 define(EZE_MY_ACCOUNT_URL, 'home.php?mod=spacecp&ac=plugin&id=ezengage:accounts');
 
@@ -152,7 +152,7 @@ function eze_sync_list_output($profile){
 
 function eze_get_default_sync_to($uid, $event){
     $event = mysql_real_escape_string($event);
-    $query = DB::query("SELECT pid FROM " . DB::table('eze_profile') . " WHERE uid='$uid' AND Contains(sync_list, '%$event%')");
+    $query = DB::query("SELECT pid FROM " . DB::table('eze_profile') . " WHERE uid='$uid' AND sync_list LIKE '%$event%'");
     $pids = array();
     while($profile = DB::fetch($query)) {
         $pids[] = $profile['pid'];
@@ -276,7 +276,7 @@ class eze_publisher {
     }
 
     //同步Share
-    static function sync_newshare($sid, $arr, $sync_to){
+    static function sync_newshare($sid, $sync_to){
         $share = DB::fetch_first("SELECT sid,uid,type,title_template,body_general FROM " . DB::table('home_share') . " WHERE sid={$sid}");
         $status = self::format_share_status($share);
         self::publish($share['uid'], $sync_to, $status);
@@ -292,6 +292,43 @@ class eze_publisher {
         return $status;
     }
 
+    static function sync_comment($cid, $sync_to){
+        $comment = DB::fetch_first("SELECT cid,uid,idtype,id,authorid,message FROM " . DB::table('home_comment')  . " WHERE cid = $cid ");
+        $status = self::format_comment_status($comment);
+        self::publish($comment['authorid'], $sync_to, $status);
+    }
+
+    static function format_comment_status($comment){
+        global $_G;
+        switch($comment['idtype']){
+            case 'blogid':
+                $do = 'blog';
+                break;
+            case 'sid':
+                $do = 'share';
+                break;
+            default:
+                return;
+        }
+        $link = $_G['siteurl'] . "home.php?mod=space&do=$do&uid={$comment[uid]}&id={$comment[id]}#comment_anchor_{$comment[cid]}";
+        $status = eze_convert($comment['message'], $_G['charset'], 'UTF-8');
+        $status = $link . ' ' . eze_filter($status);
+        $status = substr($status, 0, 1000);
+        return $status;
+    }
+
+    static function sync_doingcomment($dcid, $sync_to){
+        $comment = DB::fetch_first("SELECT id,uid,message FROM " . DB::table('home_docomment')  . " WHERE id = $dcid ");
+        $status = self::format_doingcomment_status($comment);
+        self::publish($comment['uid'], $sync_to, $status);
+    }
+
+    static function format_doingcomment_status($docomment){
+        global $_G;
+        $status = eze_convert($docomment['message'], $_G['charset'], 'UTF-8');
+        $status = substr($status, 0, 1000);
+        return $status;
+    }
 
     //将内容发布出去,所有的同步内容最终通过这个函数发布
     static function publish($uid, $sync_to, $status){

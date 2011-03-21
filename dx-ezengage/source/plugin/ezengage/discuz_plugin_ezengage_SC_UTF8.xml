@@ -14,7 +14,7 @@
             <item id="datatables"><![CDATA[eze_profile]]></item>
             <item id="directory"><![CDATA[ezengage/]]></item>
             <item id="copyright"><![CDATA[ezEngage Team]]></item>
-            <item id="version"><![CDATA[0.2.5.2]]></item>
+            <item id="version"><![CDATA[0.2.5.3]]></item>
             <item id="__modules">
                 <item id="0">
                     <item id="name"><![CDATA[common]]></item>
@@ -148,7 +148,7 @@
                 <item id="sync_name_reply"><![CDATA[回帖]]></item>
                 <item id="sync_name_blogcomment"><![CDATA[日志评论]]></item>
                 <item id="sync_name_sharecomment"><![CDATA[分享评论]]></item>
-                <item id="sync_name_dogingcomment"><![CDATA[记录评论]]></item>
+                <item id="sync_name_doingcomment"><![CDATA[记录评论]]></item>
             </item>
             <item id="templatelang">
                 <item id="myaccounts"><![CDATA[我绑定的帐号]]></item>

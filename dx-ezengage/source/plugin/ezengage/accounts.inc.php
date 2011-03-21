@@ -29,7 +29,7 @@ if($_G['gp_pluginop'] == 'update' && submitcheck('updateuser')) {
         }
         $profile['sync_list'] = $sync_list;
         $e_sync_list = mysql_real_escape_string($sync_list);
-		DB::query("UPDATE " . DB::table('eze_profile') . " SET sync_list = '$e_sync_list' WHERE uid='$_G[uid]';");
+		DB::query("UPDATE " . DB::table('eze_profile') . " SET sync_list = '$e_sync_list' WHERE uid='$_G[uid]' AND pid=$profile[pid];");
     }
 	showmessage('ezengage:updateuser_succeed', EZE_MY_ACCOUNT_URL);
     exit();

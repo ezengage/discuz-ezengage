@@ -120,7 +120,20 @@ class plugin_ezengage_home extends plugin_ezengage{
                     $_G['gp_eze_sync_event'] = 'newblog';
                     break;
                 case 'doing':
-                    $_G['gp_eze_sync_event'] = 'newdoing';
+                    if($_G['gp_op'] == 'comment'){
+                        $_G['gp_eze_sync_event'] = 'doingcomment';
+                    }
+                    else{
+                        $_G['gp_eze_sync_event'] = 'newdoing';
+                    }
+                    break;
+                case 'comment':
+                    if($_G['gp_idtype'] == 'blogid'){
+                        $_G['gp_eze_sync_event'] = 'blogcomment';
+                    }
+                    else if($_G['gp_idtype'] == 'sid'){
+                        $_G['gp_eze_sync_event'] = 'sharecomment';
+                    }
                     break;
             }
             if(isset($_G['gp_eze_sync_event'])){
@@ -137,7 +150,6 @@ class plugin_ezengage_home extends plugin_ezengage{
 
     static function _sync_newshare(){
         global $_G;
-        $arr = isset($GLOBALS['arr']) ? (array)$GLOBALS['arr'] : array();
         $sid = isset($GLOBALS['sid']) ? (int)$GLOBALS['sid'] : 0; 
         if($sid >= 1){
             eze_publisher::sync_newshare($sid, $_G['gp_eze_should_sync']);
@@ -157,6 +169,30 @@ class plugin_ezengage_home extends plugin_ezengage{
         $doid = isset($GLOBALS['newdoid'])  ? (int)$GLOBALS['newdoid'] : 0;
         if($doid >= 1){
             eze_publisher::sync_newdoing($doid, $_G['gp_eze_should_sync']);
+        }
+    }
+
+    static function _sync_doingcomment(){
+        global $_G;
+        $newid = intval($GLOBALS['newid']);
+        if($newid > 0){
+            eze_publisher::sync_doingcomment($newid, $_G['gp_eze_should_sync']);
+        }
+    }
+
+    static function _sync_blogcomment(){
+        self::_sync_comment();
+    }
+
+    static function _sync_sharecomment(){
+        self::_sync_comment();
+    }
+
+    static function _sync_comment(){
+        global $_G;
+        $cid = intval($GLOBALS['cid']);
+        if($cid > 0){
+            eze_publisher::sync_comment($cid, $_G['gp_eze_should_sync']);
         }
     }
 }
