@@ -69,7 +69,6 @@ class EzEngageApiClient {
             $path .= '?'.$bits['query'];
         }
         $client = new HttpClient($host, $port);
-        $client->setDebug(True);
         if($method == 'GET'){
             $client->get($path);
         }
