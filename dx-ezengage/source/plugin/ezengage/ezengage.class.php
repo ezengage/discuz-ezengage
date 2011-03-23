@@ -209,7 +209,7 @@ class plugin_ezengage_member extends plugin_ezengage{
 	function logging_input() {
 		global $_G;
 		if(!$_G['uid']){
-            return eze_login_widget('medium');
+            return eze_login_widget('medium', 252, 150);
 		}
 	}
 	

@@ -3,18 +3,18 @@
     <item id="Title"><![CDATA[Discuz! Plugin]]></item>
     <item id="Version"><![CDATA[X1.5]]></item>
     <item id="Time"><![CDATA[2011-03-20 17:06]]></item>
-    <item id="From"><![CDATA[Discuz! Board (http://dev_debian/dx/)]]></item>
+    <item id="From"><![CDATA[ezEngage (http://demo.ezengage.com/)]]></item>
     <item id="Data">
         <item id="plugin">
             <item id="available"><![CDATA[1]]></item>
             <item id="adminid"><![CDATA[1]]></item>
             <item id="name"><![CDATA[ezEngage]]></item>
             <item id="identifier"><![CDATA[ezengage]]></item>
-            <item id="description"><![CDATA[让你的站点支持使用新浪微博,腾讯微博,网易微博,搜狐微博,人人网,豆瓣网等的帐号登录。<br/>具体文档请看下面的地址 <a href="https://github.com/ezengage/ezengage-site/wiki/discuz-plugin" target="_blank">https://github.com/ezengage/ezengage-site/wiki/discuz-plugin</a>]]></item>
+            <item id="description"><![CDATA[让你的站点支持使用新浪微博,腾讯微博,网易微博,搜狐微博,人人网,豆瓣网等的帐号登录。<br/>具体文档请看下面的地址 <a href="http://ezengage.com/support/discuzx-plugin" target="_blank">http://ezengage.com/support/discuzx-plugin</a>]]></item>
             <item id="datatables"><![CDATA[eze_profile]]></item>
             <item id="directory"><![CDATA[ezengage/]]></item>
             <item id="copyright"><![CDATA[ezEngage Team]]></item>
-            <item id="version"><![CDATA[0.2.5.7]]></item>
+            <item id="version"><![CDATA[0.2]]></item>
             <item id="__modules">
                 <item id="0">
                     <item id="name"><![CDATA[common]]></item>
@@ -65,18 +65,6 @@
                     <item id="navsuburl"><![CDATA[]]></item>
                 </item>
                 <item id="4">
-                    <item id="name"><![CDATA[login]]></item>
-                    <item id="menu"><![CDATA[]]></item>
-                    <item id="url"><![CDATA[]]></item>
-                    <item id="type"><![CDATA[1]]></item>
-                    <item id="adminid"><![CDATA[1]]></item>
-                    <item id="displayorder"><![CDATA[0]]></item>
-                    <item id="navtitle"><![CDATA[]]></item>
-                    <item id="navicon"><![CDATA[]]></item>
-                    <item id="navsubname"><![CDATA[]]></item>
-                    <item id="navsuburl"><![CDATA[]]></item>
-                </item>
-                <item id="5">
                     <item id="name"><![CDATA[token]]></item>
                     <item id="menu"><![CDATA[]]></item>
                     <item id="url"><![CDATA[]]></item>

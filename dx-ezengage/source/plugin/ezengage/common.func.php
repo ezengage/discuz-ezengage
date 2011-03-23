@@ -198,7 +198,8 @@ function eze_login_widget($style = 'normal', $width = 'auto', $height = 'auto'){
                $style,
                urlencode($token_cb),
                $width,$height,
-               $width,$height
+               $width != 'auto' ? $width .'px' : 'auto',
+               $height != 'auto' ? $height .'px' : 'auto'
         );
         return $html;
     }
