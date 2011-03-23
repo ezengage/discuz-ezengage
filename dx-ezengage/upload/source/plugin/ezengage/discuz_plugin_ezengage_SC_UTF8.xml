@@ -118,6 +118,10 @@
             </item>
  
         </item>
+
+		<item id="installfile"><![CDATA[install.php]]></item>
+		<item id="uninstallfile"><![CDATA[uninstall.php]]></item>
+
         <item id="language">
             <item id="scriptlang">
                 <item id="footer_link_text"><![CDATA[ezEngage]]></item>

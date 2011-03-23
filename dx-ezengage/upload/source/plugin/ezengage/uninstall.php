@@ -1,13 +1,10 @@
 <?php
-
 /*
-	[Discuz!] (C)2001-2009 Comsenz Inc.
-	This is NOT a freeware, use is subject to license terms
-
-	$Id$
+	ezengage (C)2011 
+    http://ezengage.com/
 */
 
-if(!defined('IN_DISCUZ')) {
+if(!defined('IN_DISCUZ') || !defined('IN_ADMINCP')) {
 	exit('Access Denied');
 }
 
