@@ -130,14 +130,6 @@ function eze_register_user($profile){
         'timeoffset' => 9999
     );
     DB::insert('common_member', $userdata);
-    $pm_subject = replacesitevar($lang['auto_register_pm_subject']);
-    $pm_message = replacesitevar($lang['auto_register_pm_message']);
-    $pm_message = str_replace(array('{password}'), array($password), $pm_message);
-
-    $pm_subject = addslashes($pm_subject);
-    $pm_message = addslashes($pm_message);
-    sendpm($uid, $pm_subject, $pm_message, 0);
-
     $status_data = array(
         'uid' => $uid,
         'regip' => $_G['clientip'],
@@ -183,6 +175,15 @@ function eze_register_user($profile){
     $_CORE->session->set('username', $username);
     //创建cookie
     dsetcookie('auth', authcode("{$_G['member']['password']}\t$_G[uid]", 'ENCODE'), 2592000, 1, true);
+
+    $pm_subject = replacesitevar($lang['auto_register_pm_subject']);
+    $pm_message = replacesitevar($lang['auto_register_pm_message']);
+    $pm_message = str_replace(array('{password}'), array($password), $pm_message);
+
+    $pm_subject = addslashes($pm_subject);
+    $pm_message = addslashes($pm_message);
+
+    sendpm($uid, $pm_subject, $pm_message, 0);
 
     return True;
 }
