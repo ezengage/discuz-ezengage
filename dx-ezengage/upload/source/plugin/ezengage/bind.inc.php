@@ -33,6 +33,7 @@ else{
         else {
             if(eze_login_user($profile['uid'])){
                 dsetcookie('eze_token', '');
+                loaducenter();
                 $ucsynlogin = $_G['setting']['allowsynlogin'] ? uc_user_synlogin($_G['uid']) : '';
                 $_G['gp_refer'] = $_G['gp_refer'] ? $_G['gp_refer'] : 'index.php';
                 showmessage('login_succeed', $_G['gp_refer'], 
