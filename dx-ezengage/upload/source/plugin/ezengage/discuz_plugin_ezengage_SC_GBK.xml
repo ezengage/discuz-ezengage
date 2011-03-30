@@ -14,7 +14,7 @@
             <item id="datatables"><![CDATA[eze_profile]]></item>
             <item id="directory"><![CDATA[ezengage/]]></item>
             <item id="copyright"><![CDATA[ezEngage Team]]></item>
-            <item id="version"><![CDATA[0.2.1]]></item>
+            <item id="version"><![CDATA[0.2.2]]></item>
             <item id="__modules">
                 <item id="0">
                     <item id="name"><![CDATA[common]]></item>
