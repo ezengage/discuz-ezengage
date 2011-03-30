@@ -58,8 +58,7 @@ else{
         //否则显示将界面要求登录或注册
         else{
 
-            if($_G['cache']['plugin']['ezengage']['eze_enable_auto_register'] \
-                && eze_register_user($profile)){
+            if($_G['cache']['plugin']['ezengage']['eze_enable_auto_register'] && eze_register_user($profile)){
                 if($_G['uid']){
                     eze_bind($profile, TRUE);
                 }

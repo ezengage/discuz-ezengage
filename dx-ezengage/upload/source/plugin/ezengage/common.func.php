@@ -340,6 +340,7 @@ class eze_publisher {
     }
 
     static function format_doing_status($doing){
+        global $_G;
         $status = eze_convert($doing['message'], $_G['charset'], 'UTF-8');
         $status = eze_filter($status);
         $status = substr($status, 0, 1000);
