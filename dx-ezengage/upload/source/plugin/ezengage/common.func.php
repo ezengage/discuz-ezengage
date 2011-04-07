@@ -79,10 +79,10 @@ function eze_register_user($profile){
     loaducenter();
     require_once libfile('function/misc');
     require_once libfile('function/member');
-    require_once DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php';
     $eze_options = $_G['cache']['plugin']['ezengage'];
 
-    $lang = $scriptlang['ezengage'];
+    loadcache('pluginlanguage_script');
+    $lang = $_G['cache']['pluginlanguage_script']['ezengage'];
 
     $username = $profile['preferred_username'];
 
@@ -210,7 +210,9 @@ function eze_login_widget_output($style = 'normal', $width = 'auto', $height = '
     echo eze_login_widget($style, $width, $height);
 }
 function eze_sync_list($profile){
-    include(DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php');
+    global $_G;
+    loadcache('pluginlanguage_script');
+    $lang = $_G['cache']['pluginlanguage_script']['ezengage'];
     $html = array();
     foreach(explode(',', EZE_ALL_SYNC_LIST) as $sync_item){
         if (strpos($profile['sync_list'], $sync_item) === FALSE){
@@ -221,7 +223,7 @@ function eze_sync_list($profile){
             $html[] = "<input name='sync_list_{$profile[pid]}[]' type='checkbox' class='checkbox'
                        value='$sync_item' checked='checked' />";
         }
-        $html[] = $scriptlang['ezengage']['sync_name_' . $sync_item];
+        $html[] = $lang['sync_name_' . $sync_item];
     }
     $html = implode(' ', $html);
     return $html;
@@ -267,8 +269,8 @@ function eze_current_profile(){
 
 function eze_bind($profile, $send_pm = FALSE){
     global $_G;
-    include(DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php');
-    $lang = $scriptlang['ezengage'];
+    loadcache('pluginlanguage_script');
+    $lang = $_G['cache']['pluginlanguage_script']['ezengage'];
 
     if($_G['uid'] && $profile && !$profile['uid']){
         $ret = DB::query(sprintf(

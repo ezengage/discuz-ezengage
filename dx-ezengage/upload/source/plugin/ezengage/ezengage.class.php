@@ -14,9 +14,10 @@ class plugin_ezengage {
 
     function __construct() { 
         global $_G;
-        include(DISCUZ_ROOT.'/data/plugindata/ezengage.lang.php');
-        $this->slang = $scriptlang['ezengage'];
-        $this->tlang = $templatelang['ezengage'];
+        loadcache('pluginlanguage_install');
+        $this->slang = $_G['cache']['pluginlanguage_script']['ezengage'];
+        loadcache('pluginlanguage_template');
+        $this->tlang = $_G['cache']['pluginlanguage_template']['ezengage'];
         $this->profile = eze_current_profile();
         $this->options = $_G['cache']['plugin']['ezengage'];
     }

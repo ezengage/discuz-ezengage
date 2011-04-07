@@ -8,7 +8,8 @@ if(!defined('IN_DISCUZ') || !defined('IN_ADMINCP')) {
 	exit('Access Denied');
 }
 
-$inslang = $installlang['ezengage'];
+loadcache('pluginlanguage_install');
+$inslang = $_G['cache']['pluginlanguage_install']['ezengage'];
 $installurl = "{$_G[basefilename]}?action=plugins&operation=$operation&dir=$dir&installtype=$installtype&instype=";
 $sql = "SHOW TABLES LIKE '%eze_profile'";
 $check = DB::num_rows(DB::query($sql));

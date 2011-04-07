@@ -12,6 +12,7 @@ if(!defined('IN_DISCUZ')) {
 
 $token = authcode($_G['cookie']['eze_token'], 'DECODE');
 
+
 $escaped_token = mysql_real_escape_string($token);
 $profile = DB::fetch_first("SELECT * FROM " . DB::table('eze_profile') ." WHERE token='{$escaped_token}'");
 
@@ -35,10 +36,8 @@ else{
                 dsetcookie('eze_token', '');
                 loaducenter();
                 $ucsynlogin = $_G['setting']['allowsynlogin'] ? uc_user_synlogin($_G['uid']) : '';
-                $_G['gp_refer'] = $_G['gp_refer'] ? $_G['gp_refer'] : 'index.php';
-                showmessage('login_succeed', $_G['gp_refer'], 
-                    array('username' => $_G['member']['username'], 'ucsynlogin' => $ucsynlogin, 'uid' => $_G['uid'])
-                );
+                $url_forward =  $_G['gp_refer'] ? $_G['gp_refer'] : 'index.php';
+                showmessage('login_succeed', $url_forward ? $url_forward : './', array('username' => $_G['member']['username'], 'usergroup' => $_G['group']['grouptitle'], 'uid' => $_G['uid']), array('extrajs' => $ucsynlogin));
             }
             else{
                 showmessage('ezengage:login_fail', 'member.php?mod=logging&action=login');
@@ -62,10 +61,10 @@ else{
                 if($_G['uid']){
                     eze_bind($profile, TRUE);
                 }
-                $_G['gp_refer'] = $_G['gp_refer'] ? $_G['gp_refer'] : 'index.php';
-                showmessage('login_succeed', $_G['gp_refer'], 
-                    array('username' => $_G['member']['username'],'uid' => $_G['uid'])
-                );
+                loaducenter();
+                $ucsynlogin = $_G['setting']['allowsynlogin'] ? uc_user_synlogin($_G['uid']) : '';
+                $url_forward =  $_G['gp_refer'] ? $_G['gp_refer'] : 'index.php';
+                showmessage('login_succeed', $url_forward ? $url_forward : './', array('username' => $_G['member']['username'], 'usergroup' => $_G['group']['grouptitle'], 'uid' => $_G['uid']), array('extrajs' => $ucsynlogin));
             }
             else{
                 dheader("location: member.php?mod=register&referer=" .urlencode(EZE_MY_ACCOUNT_URL));
